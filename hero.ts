@@ -1,2 +1,110 @@
 import { heroui } from "@heroui/theme";
-export default heroui();
+
+export default heroui({
+  defaultTheme: "light",
+  themes: {
+    light: {
+      colors: {
+        background: "#FAFAFA", // clean white
+        foreground: "#2D2A26", // warm dark brown
+        content1: "#FFFFFF", // cards
+        content2: "#F5F2EE", // secondary surfaces
+        content3: "#EDE9E3", // tertiary surfaces
+        content4: "#E5E0D9", // quaternary surfaces
+        default: {
+          50: "#FAF8F5",
+          100: "#F5F2EE",
+          200: "#EDE9E3",
+          300: "#E5E0D9",
+          400: "#B8B0A5",
+          500: "#8A8279",
+          600: "#6B6560",
+          700: "#4D4944",
+          800: "#2D2A26",
+          900: "#1A1816",
+          DEFAULT: "#EDE9E3",
+          foreground: "#2D2A26",
+        },
+        primary: {
+          50: "#FFF8EB",
+          100: "#FFEFC6",
+          200: "#FFE08A",
+          300: "#FFD04E",
+          400: "#FFC021",
+          500: "#F5A623",
+          600: "#DB8B0A",
+          700: "#B6690C",
+          800: "#945211",
+          900: "#7A4312",
+          DEFAULT: "#F5A623",
+          foreground: "#FFFFFF",
+        },
+        secondary: {
+          50: "#FFF5F0",
+          100: "#FFE8DB",
+          200: "#FFCDB3",
+          300: "#FFAA80",
+          400: "#FF8040",
+          500: "#F06418",
+          600: "#D14A0E",
+          700: "#AD380E",
+          800: "#8A2F13",
+          900: "#712A14",
+          DEFAULT: "#F06418",
+          foreground: "#FFFFFF",
+        },
+        success: {
+          50: "#F0FDF4",
+          100: "#DCFCE7",
+          200: "#BBF7D0",
+          300: "#86EFAC",
+          400: "#4ADE80",
+          500: "#22C55E",
+          600: "#16A34A",
+          700: "#15803D",
+          800: "#166534",
+          900: "#14532D",
+          DEFAULT: "#22C55E",
+          foreground: "#FFFFFF",
+        },
+        warning: {
+          50: "#FFFBEB",
+          100: "#FEF3C7",
+          200: "#FDE68A",
+          300: "#FCD34D",
+          400: "#FBBF24",
+          500: "#F59E0B",
+          600: "#D97706",
+          700: "#B45309",
+          800: "#92400E",
+          900: "#78350F",
+          DEFAULT: "#F59E0B",
+          foreground: "#FFFFFF",
+        },
+        danger: {
+          50: "#FEF2F2",
+          100: "#FEE2E2",
+          200: "#FECACA",
+          300: "#FCA5A5",
+          400: "#F87171",
+          500: "#EF4444",
+          600: "#DC2626",
+          700: "#B91C1C",
+          800: "#991B1B",
+          900: "#7F1D1D",
+          DEFAULT: "#EF4444",
+          foreground: "#FFFFFF",
+        },
+        focus: "#F5A623",
+        divider: "rgba(45, 42, 38, 0.08)",
+      },
+      layout: {
+        radius: {
+          small: "6px",
+          medium: "10px",
+          large: "14px",
+        },
+      },
+    },
+  },
+});

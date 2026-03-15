@@ -7,6 +7,111 @@
 @custom-variant dark (&:is(.dark *));
 
 @theme {
-    --font-sans: "font", sans-serif;
-    --font-mono: "monospace", monospace;
+    --font-sans: var(--font-sans), "Comic Neue", sans-serif;
+    --font-display: var(--font-display), "Baloo 2", sans-serif;
+    --font-mono: var(--font-mono), "Fira Code", monospace;
+}
+
+/* Cursor pointer on all interactive elements */
+button,
+[role="button"],
+a,
+[tabindex="0"],
+input[type="checkbox"],
+input[type="radio"],
+select,
+summary {
+  cursor: pointer;
+}
+
+/* Display font for headings */
+h1, h2, h3 {
+  font-family: var(--font-display), "Baloo 2", sans-serif;
+}
+
+/* Respect reduced motion preference */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* === SugarCoach Theme Utilities === */
+
+/* Dashboard background */
+.dashboard-bg {
+  background: #FAFAFA;
+}
+
+/* Grid pattern — disabled */
+.grid-pattern {
+}
+
+/* Sidebar accent strip */
+.sidebar-accent-strip {
+  background: rgba(245, 166, 35, 0.25);
+}
+
+/* Animations */
+@keyframes float {
+  0%, 100% { transform: translateY(0px) translateX(0px); }
+  25% { transform: translateY(-10px) translateX(5px); }
+  50% { transform: translateY(-5px) translateX(-5px); }
+  75% { transform: translateY(-15px) translateX(3px); }
+}
+
+@keyframes floatSlow {
+  0%, 100% { transform: translateY(0px) translateX(0px); }
+  33% { transform: translateY(-8px) translateX(-8px); }
+  66% { transform: translateY(-16px) translateX(4px); }
+}
+
+@keyframes pulse-glow {
+  0%, 100% { opacity: 0.4; transform: scale(1); }
+  50% { opacity: 0.8; transform: scale(1.05); }
+}
+
+.animate-float {
+  animation: float 6s ease-in-out infinite;
+}
+
+.animate-float-slow {
+  animation: floatSlow 8s ease-in-out infinite;
+}
+
+.animate-pulse-glow {
+  animation: pulse-glow 3s ease-in-out infinite;
+}
+
+/* Chat input highlight */
+.chat-input-glow {
+  background: rgba(245, 166, 35, 0.04);
+}
+
+/* === Streak Button Glow === */
+@keyframes streak-glow-pulse {
+  0%, 100% {
+    box-shadow: 0 0 12px rgba(245, 158, 11, 0.3), 0 0 24px rgba(239, 68, 68, 0.15);
+  }
+  50% {
+    box-shadow: 0 0 20px rgba(245, 158, 11, 0.5), 0 0 40px rgba(239, 68, 68, 0.2);
+  }
+}
+
+.streak-button-glow {
+  animation: streak-glow-pulse 2s ease-in-out infinite;
+}
+
+@keyframes streak-idle-bounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-3px); }
+}
+
+.streak-button-bounce {
+  animation: streak-idle-bounce 3s ease-in-out infinite;
 }
