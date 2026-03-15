@@ -328,7 +328,9 @@ function AnimatedCounter({
   });
 
   return (
-    <span className={`inline-flex items-baseline leading-none ${className ?? ""}`}>
+    <span
+      className={`inline-flex items-baseline leading-none ${className ?? ""}`}
+    >
       {digits.map((digit, i) => {
         const prevDigit = prevDigits.current[i];
         const dir =

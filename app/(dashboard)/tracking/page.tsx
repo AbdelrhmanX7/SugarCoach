@@ -161,19 +161,17 @@ export default function TrackingPage() {
           { sum: number; count: number; time: string }
         >();
 
-        readings.forEach(
-          (r: { reading_time: string; value: number }) => {
-            const dayKey = format(new Date(r.reading_time), "yyyy-MM-dd");
+        readings.forEach((r: { reading_time: string; value: number }) => {
+          const dayKey = format(new Date(r.reading_time), "yyyy-MM-dd");
 
-            if (!dayMap.has(dayKey)) {
-              dayMap.set(dayKey, { sum: 0, count: 0, time: r.reading_time });
-            }
-            const entry = dayMap.get(dayKey)!;
+          if (!dayMap.has(dayKey)) {
+            dayMap.set(dayKey, { sum: 0, count: 0, time: r.reading_time });
+          }
+          const entry = dayMap.get(dayKey)!;
 
-            entry.sum += r.value;
-            entry.count += 1;
-          },
-        );
+          entry.sum += r.value;
+          entry.count += 1;
+        });
 
         chartReadings = Array.from(dayMap.entries())
           .sort(([a], [b]) => a.localeCompare(b))
@@ -258,9 +256,7 @@ export default function TrackingPage() {
         );
 
         carbChartReadings = meals
-          .filter(
-            (m: { total_carbs: number | null }) => m.total_carbs != null,
-          )
+          .filter((m: { total_carbs: number | null }) => m.total_carbs != null)
           .map((m: { meal_time: string; total_carbs: number | null }) => ({
             time: m.meal_time,
             carbs: m.total_carbs ?? 0,
@@ -273,16 +269,14 @@ export default function TrackingPage() {
           { total: number; time: string }
         >();
 
-        insulin.forEach(
-          (i: { injection_time: string; units: number }) => {
-            const dayKey = format(new Date(i.injection_time), "yyyy-MM-dd");
+        insulin.forEach((i: { injection_time: string; units: number }) => {
+          const dayKey = format(new Date(i.injection_time), "yyyy-MM-dd");
 
-            if (!insulinDayMap.has(dayKey)) {
-              insulinDayMap.set(dayKey, { total: 0, time: i.injection_time });
-            }
-            insulinDayMap.get(dayKey)!.total += i.units;
-          },
-        );
+          if (!insulinDayMap.has(dayKey)) {
+            insulinDayMap.set(dayKey, { total: 0, time: i.injection_time });
+          }
+          insulinDayMap.get(dayKey)!.total += i.units;
+        });
 
         insulinChartReadings = Array.from(insulinDayMap.entries())
           .sort(([a], [b]) => a.localeCompare(b))
@@ -295,25 +289,18 @@ export default function TrackingPage() {
                 : format(new Date(time), "MMM dd"),
           }));
 
-        const carbDayMap = new Map<
-          string,
-          { total: number; time: string }
-        >();
+        const carbDayMap = new Map<string, { total: number; time: string }>();
 
         meals
-          .filter(
-            (m: { total_carbs: number | null }) => m.total_carbs != null,
-          )
-          .forEach(
-            (m: { meal_time: string; total_carbs: number | null }) => {
-              const dayKey = format(new Date(m.meal_time), "yyyy-MM-dd");
+          .filter((m: { total_carbs: number | null }) => m.total_carbs != null)
+          .forEach((m: { meal_time: string; total_carbs: number | null }) => {
+            const dayKey = format(new Date(m.meal_time), "yyyy-MM-dd");
 
-              if (!carbDayMap.has(dayKey)) {
-                carbDayMap.set(dayKey, { total: 0, time: m.meal_time });
-              }
-              carbDayMap.get(dayKey)!.total += m.total_carbs ?? 0;
-            },
-          );
+            if (!carbDayMap.has(dayKey)) {
+              carbDayMap.set(dayKey, { total: 0, time: m.meal_time });
+            }
+            carbDayMap.get(dayKey)!.total += m.total_carbs ?? 0;
+          });
 
         carbChartReadings = Array.from(carbDayMap.entries())
           .sort(([a], [b]) => a.localeCompare(b))

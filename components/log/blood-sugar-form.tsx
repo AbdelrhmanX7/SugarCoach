@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@heroui/button";
 import { Card, CardBody } from "@heroui/card";
@@ -104,7 +104,6 @@ export default function BloodSugarForm({
   } | null>(null);
   const [valueError, setValueError] = useState("");
   const [showXp, setShowXp] = useState(false);
-
 
   const valueColor = getValueColor(value, unit);
 
@@ -423,87 +422,7 @@ export default function BloodSugarForm({
           <CardBody className="p-6">{formContent}</CardBody>
         </Card>
       )}
-
     </div>
   );
 }
 
-/* ---- Helpers ---- */
-
-function formatBG(val: string, unit: string): string {
-  const num = parseFloat(val);
-
-  if (isNaN(num) || !val) return unit === "mg/dL" ? "0" : "0.0";
-
-  return unit === "mmol/L" ? num.toFixed(1) : String(Math.round(num));
-}
-
-/* ---- Rolling number display ---- */
-
-const digitVariants = {
-  enter: (d: number) => ({ y: d * 18, opacity: 0 }),
-  center: { y: 0, opacity: 1 },
-  exit: (d: number) => ({ y: d * -18, opacity: 0 }),
-};
-
-function RollingNumber({
-  value,
-  className,
-}: {
-  value: string;
-  className?: string;
-}) {
-  const chars = value.split("");
-  const prevChars = useRef(chars);
-
-  useEffect(() => {
-    prevChars.current = chars;
-  });
-
-  return (
-    <span
-      className={`inline-flex items-baseline leading-none ${className ?? ""}`}
-    >
-      {chars.map((char, i) => {
-        if (char === "." || char === "-") {
-          return (
-            <span key={`sep-${i}`} className="inline-block">
-              {char}
-            </span>
-          );
-        }
-
-        const prev = prevChars.current[i];
-        const dir =
-          prev === undefined || char === prev
-            ? 1
-            : Number(char) > Number(prev)
-              ? 1
-              : -1;
-
-        return (
-          <span
-            key={i}
-            className="relative inline-block overflow-hidden text-center"
-            style={{ width: "0.55em", height: "1em" }}
-          >
-            <AnimatePresence custom={dir} initial={false} mode="popLayout">
-              <motion.span
-                key={char}
-                animate="center"
-                className="absolute inset-0"
-                custom={dir}
-                exit="exit"
-                initial="enter"
-                transition={{ type: "spring", stiffness: 500, damping: 30 }}
-                variants={digitVariants}
-              >
-                {char}
-              </motion.span>
-            </AnimatePresence>
-          </span>
-        );
-      })}
-    </span>
-  );
-}

@@ -210,7 +210,9 @@ function InsulinRow({ log }: { log: InsulinLog }) {
             {log.units}u
           </span>
           {log.insulin_brand && (
-            <span className="text-sm text-default-600">{log.insulin_brand}</span>
+            <span className="text-sm text-default-600">
+              {log.insulin_brand}
+            </span>
           )}
         </div>
         <p className="truncate text-xs text-default-400">
@@ -263,9 +265,7 @@ function MealRow({ log }: { log: MealLog }) {
             {log.description || log.meal_type || "Meal"}
           </p>
           <div className="flex items-center gap-2 text-xs text-default-400">
-            {log.total_carbs != null && (
-              <span>{log.total_carbs}g carbs</span>
-            )}
+            {log.total_carbs != null && <span>{log.total_carbs}g carbs</span>}
             {log.total_calories != null && (
               <span>{log.total_calories} kcal</span>
             )}
@@ -307,17 +307,14 @@ function MealRow({ log }: { log: MealLog }) {
                 AI analyzed
               </span>
             )}
-            {log.recommended_insulin != null &&
-              log.recommended_insulin > 0 && (
-                <span className="text-xs text-default-500">
-                  Suggested: {log.recommended_insulin}u insulin
-                </span>
-              )}
+            {log.recommended_insulin != null && log.recommended_insulin > 0 && (
+              <span className="text-xs text-default-500">
+                Suggested: {log.recommended_insulin}u insulin
+              </span>
+            )}
           </div>
 
-          {log.notes && (
-            <p className="text-xs text-default-400">{log.notes}</p>
-          )}
+          {log.notes && <p className="text-xs text-default-400">{log.notes}</p>}
         </div>
       )}
     </div>

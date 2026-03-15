@@ -8,7 +8,6 @@ import {
   DrawerHeader,
   DrawerBody,
 } from "@heroui/drawer";
-import { Button } from "@heroui/button";
 import { Chip } from "@heroui/chip";
 import NextLink from "next/link";
 import { HugeiconsIcon } from "@hugeicons/react";

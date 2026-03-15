@@ -120,12 +120,12 @@ export function ChatInput({
 
           {/* Text input */}
           <Input
-            id="chat-message-input"
             className="flex-1"
             classNames={{
               inputWrapper:
                 "rounded-2xl border border-white/10 bg-white/5 backdrop-blur-sm group-data-[focus=true]:bg-white/10 group-data-[focus=true]:border-violet-500/30 transition-colors",
             }}
+            id="chat-message-input"
             isDisabled={isLoading || isRecording}
             placeholder={
               isRecording

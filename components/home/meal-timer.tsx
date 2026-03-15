@@ -81,7 +81,9 @@ export function MealTimer() {
 
     setTimer(loaded);
     if (loaded.status === "running") {
-      setSecondsLeft(Math.max(0, Math.ceil((loaded.endTime - Date.now()) / 1000)));
+      setSecondsLeft(
+        Math.max(0, Math.ceil((loaded.endTime - Date.now()) / 1000)),
+      );
     }
     if (loaded.status === "done") {
       setAgoText(formatAgo(loaded.endTime));
@@ -94,10 +96,16 @@ export function MealTimer() {
 
     intervalRef.current = setInterval(() => {
       if (timer.status === "running") {
-        const remaining = Math.max(0, Math.ceil((timer.endTime - Date.now()) / 1000));
+        const remaining = Math.max(
+          0,
+          Math.ceil((timer.endTime - Date.now()) / 1000),
+        );
 
         if (remaining <= 0) {
-          const doneState: TimerState = { status: "done", endTime: timer.endTime };
+          const doneState: TimerState = {
+            status: "done",
+            endTime: timer.endTime,
+          };
 
           setTimer(doneState);
           saveTimer(doneState);
@@ -127,7 +135,11 @@ export function MealTimer() {
 
   // Request notification permission
   useEffect(() => {
-    if (timer.status === "running" && typeof Notification !== "undefined" && Notification.permission === "default") {
+    if (
+      timer.status === "running" &&
+      typeof Notification !== "undefined" &&
+      Notification.permission === "default"
+    ) {
       Notification.requestPermission();
     }
   }, [timer.status]);
@@ -196,9 +208,7 @@ export function MealTimer() {
         />
         <div className="flex-1 min-w-0">
           <p className="text-sm font-semibold text-success">Time to eat!</p>
-          <p className="text-xs text-default-400">
-            Finished {agoText}
-          </p>
+          <p className="text-xs text-default-400">Finished {agoText}</p>
         </div>
         <Button
           className="shrink-0"
@@ -284,7 +294,10 @@ function playSound() {
 }
 
 function sendNotification() {
-  if (typeof Notification !== "undefined" && Notification.permission === "granted") {
+  if (
+    typeof Notification !== "undefined" &&
+    Notification.permission === "granted"
+  ) {
     new Notification("Time to eat!", {
       body: "Your meal timer is done. Enjoy your food!",
     });

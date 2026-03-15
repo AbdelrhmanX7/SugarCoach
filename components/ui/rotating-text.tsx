@@ -1,9 +1,9 @@
 "use client";
 
+import type { Transition, Target, TargetAndTransition } from "framer-motion";
+
 import { useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-
-import type { Transition, Target, TargetAndTransition } from "framer-motion";
 
 interface RotatingTextProps {
   texts: string[];
@@ -74,13 +74,13 @@ export function RotatingText({
 
   return (
     <motion.span
+      layout
       className={[
         "relative inline-flex flex-wrap whitespace-pre-wrap",
         mainClassName,
       ]
         .filter(Boolean)
         .join(" ")}
-      layout
       transition={transition}
     >
       {/* Screen reader text */}
@@ -89,9 +89,9 @@ export function RotatingText({
       <AnimatePresence initial={false} mode="popLayout">
         <motion.span
           key={currentIndex}
+          layout
           aria-hidden="true"
           className="inline-flex flex-wrap"
-          layout
         >
           {elements.map((wordObj, wordIndex, array) => {
             const previousCharsCount = array

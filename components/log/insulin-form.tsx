@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@heroui/button";
 import { Card, CardBody } from "@heroui/card";
@@ -459,80 +459,3 @@ export default function InsulinForm({ compact = false }: InsulinFormProps) {
   );
 }
 
-/* ---- Helpers ---- */
-
-function formatFixed(val: string, decimals: number): string {
-  const num = parseFloat(val);
-
-  if (isNaN(num)) return "0".padEnd(decimals + 2, "0");
-
-  return num.toFixed(decimals);
-}
-
-/* ---- Rolling number display ---- */
-
-const digitVariants = {
-  enter: (d: number) => ({ y: d * 16, opacity: 0 }),
-  center: { y: 0, opacity: 1 },
-  exit: (d: number) => ({ y: d * -16, opacity: 0 }),
-};
-
-function RollingNumber({
-  value,
-  className,
-}: {
-  value: string;
-  className?: string;
-}) {
-  const chars = value.split("");
-  const prevChars = useRef(chars);
-
-  useEffect(() => {
-    prevChars.current = chars;
-  });
-
-  return (
-    <span className={`inline-flex items-baseline leading-none ${className ?? ""}`}>
-      {chars.map((char, i) => {
-        if (char === "." || char === "-") {
-          return (
-            <span key={`sep-${i}`} className="inline-block">
-              {char}
-            </span>
-          );
-        }
-
-        const prev = prevChars.current[i];
-        const dir =
-          prev === undefined || char === prev
-            ? 1
-            : Number(char) > Number(prev)
-              ? 1
-              : -1;
-
-        return (
-          <span
-            key={i}
-            className="relative inline-block overflow-hidden text-center"
-            style={{ width: "0.6em", height: "1em" }}
-          >
-            <AnimatePresence custom={dir} initial={false} mode="popLayout">
-              <motion.span
-                key={char}
-                animate="center"
-                className="absolute inset-0"
-                custom={dir}
-                exit="exit"
-                initial="enter"
-                transition={{ type: "spring", stiffness: 500, damping: 30 }}
-                variants={digitVariants}
-              >
-                {char}
-              </motion.span>
-            </AnimatePresence>
-          </span>
-        );
-      })}
-    </span>
-  );
-}

@@ -293,7 +293,10 @@ export default function DashboardHome() {
         {/* Stats row */}
         <div className="flex items-center justify-around">
           {statItems.map((stat) => (
-            <div key={stat.label} className="flex flex-col items-center gap-0.5">
+            <div
+              key={stat.label}
+              className="flex flex-col items-center gap-0.5"
+            >
               <div className="flex items-center gap-1.5">
                 <HugeiconsIcon
                   className={stat.color}

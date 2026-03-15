@@ -144,7 +144,7 @@ export async function addPantryItem(
 
 export async function updatePantryItem(
   id: string,
-  input: PantryItemInput,
+  input: Partial<PantryItemInput>,
 ): Promise<PantryActionResult> {
   try {
     const supabase = await createClient();
