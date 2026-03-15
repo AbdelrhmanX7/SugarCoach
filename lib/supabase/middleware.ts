@@ -34,9 +34,25 @@ export async function updateSession(request: NextRequest) {
     },
   });
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  // Allow auth pages and landing page without any checks
+  const publicPaths = ["/login", "/register", "/"];
+  const isPublic = publicPaths.includes(request.nextUrl.pathname);
+
+  let user = null;
+
+  try {
+    const { data } = await supabase.auth.getUser();
+
+    user = data.user;
+  } catch {
+    // Supabase unreachable — let the request through
+    return supabaseResponse;
+  }
+
+  // Public pages — no auth needed, just pass through
+  if (!user && isPublic) {
+    return supabaseResponse;
+  }
 
   // Protected routes - redirect to login if not authenticated
   if (!user && request.nextUrl.pathname.startsWith("/(dashboard)")) {
