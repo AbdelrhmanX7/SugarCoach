@@ -458,4 +458,3 @@ export default function InsulinForm({ compact = false }: InsulinFormProps) {
     </div>
   );
 }
-

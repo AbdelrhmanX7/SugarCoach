@@ -70,7 +70,8 @@ export default function PantryItemCard({
     setSaving(true);
     const result = await updatePantryItem(item.id, { quantity: clamped });
 
-    if (result.data && onUpdate) onUpdate(result.data);
+    if (result.data && !Array.isArray(result.data) && onUpdate)
+      onUpdate(result.data);
     setSaving(false);
   }
 
@@ -84,7 +85,8 @@ export default function PantryItemCard({
       protein: editProtein ? parseFloat(editProtein) : null,
     });
 
-    if (result.data && onUpdate) onUpdate(result.data);
+    if (result.data && !Array.isArray(result.data) && onUpdate)
+      onUpdate(result.data);
     setSaving(false);
     setEditing(false);
   }
