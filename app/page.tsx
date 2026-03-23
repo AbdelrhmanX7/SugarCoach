@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef, useCallback, useEffect, useState } from "react";
+import { motion, useScroll, useTransform } from "framer-motion";
 import { Link } from "@heroui/link";
 import { HugeiconsIcon } from "@hugeicons/react";
 import {
@@ -19,7 +20,7 @@ import {
   Upload02Icon,
 } from "@hugeicons/core-free-icons";
 
-/* ── Scroll-reveal ── */
+/* ── Scroll-reveal (Framer Motion — shows AND hides on scroll) ── */
 function Reveal({
   children,
   className = "",
@@ -29,44 +30,28 @@ function Reveal({
   className?: string;
   delay?: number;
 }) {
-  const ref = useRef<HTMLDivElement>(null);
-  const [v, setV] = useState(false);
-
-  useEffect(() => {
-    const el = ref.current;
-
-    if (!el) return;
-    const ob = new IntersectionObserver(
-      ([e]) => {
-        if (e.isIntersecting) {
-          setV(true);
-          ob.disconnect();
-        }
-      },
-      { threshold: 0.15 },
-    );
-
-    ob.observe(el);
-
-    return () => ob.disconnect();
-  }, []);
-
   return (
-    <div
-      ref={ref}
-      className={`transition-all duration-700 ease-out ${v ? "translate-y-0 opacity-100" : "translate-y-6 opacity-0"} ${className}`}
-      style={{ transitionDelay: `${delay}ms` }}
+    <motion.div
+      className={className}
+      initial={{ opacity: 0, y: 40 }}
+      transition={{
+        duration: 0.6,
+        delay: delay / 1000,
+        ease: [0.16, 1, 0.3, 1],
+      }}
+      viewport={{ once: false, amount: 0.2 }}
+      whileInView={{ opacity: 1, y: 0 }}
     >
       {children}
-    </div>
+    </motion.div>
   );
 }
 
-/* ── Count-up ── */
+/* ── Count-up (re-triggers on each scroll into view) ── */
 function Counter({ end, suffix = "" }: { end: number; suffix?: string }) {
   const ref = useRef<HTMLSpanElement>(null);
   const [val, setVal] = useState(0);
-  const ran = useRef(false);
+  const animating = useRef(false);
 
   useEffect(() => {
     const el = ref.current;
@@ -74,18 +59,26 @@ function Counter({ end, suffix = "" }: { end: number; suffix?: string }) {
     if (!el) return;
     const ob = new IntersectionObserver(
       ([e]) => {
-        if (e.isIntersecting && !ran.current) {
-          ran.current = true;
+        if (e.isIntersecting && !animating.current) {
+          animating.current = true;
+          setVal(0);
           const dur = 1200;
           const t0 = performance.now();
           const tick = (now: number) => {
             const p = Math.min((now - t0) / dur, 1);
 
             setVal(Math.round((1 - Math.pow(1 - p, 3)) * end));
-            if (p < 1) requestAnimationFrame(tick);
+            if (p < 1) {
+              requestAnimationFrame(tick);
+            } else {
+              animating.current = false;
+            }
           };
 
           requestAnimationFrame(tick);
+        } else if (!e.isIntersecting) {
+          animating.current = false;
+          setVal(0);
         }
       },
       { threshold: 0.5 },
@@ -204,6 +197,12 @@ export default function Home() {
       blob3.current.style.transform = `translate(${x * -15}px, ${y * 15}px)`;
   }, []);
 
+  /* Scroll-linked hero parallax */
+  const { scrollY } = useScroll();
+  const heroOpacity = useTransform(scrollY, [0, 500], [1, 0]);
+  const heroScale = useTransform(scrollY, [0, 500], [1, 0.95]);
+  const heroY = useTransform(scrollY, [0, 500], [0, 80]);
+
   return (
     <div className="flex flex-col" style={{ background: "#FFF8F0" }}>
       {/* ═══════════════ HERO ═══════════════ */}
@@ -232,7 +231,10 @@ export default function Home() {
         <div className="pointer-events-none absolute bottom-[15%] right-[12%] h-6 w-6 rounded-full border-[3px] border-[#E91E63]/15" />
         <div className="pointer-events-none absolute right-[25%] top-[18%] h-5 w-5 rotate-45 border-[3px] border-[#4CAF50]/15" />
 
-        <div className="relative z-10 flex w-full max-w-5xl flex-col items-center gap-16 lg:flex-row lg:items-center lg:justify-between">
+        <motion.div
+          className="relative z-10 flex w-full max-w-5xl flex-col items-center gap-16 lg:flex-row lg:items-center lg:justify-between"
+          style={{ opacity: heroOpacity, scale: heroScale, y: heroY }}
+        >
           <div className="flex max-w-md flex-col items-center text-center lg:items-start lg:text-left">
             <div
               className="mb-6 flex items-center gap-3 rounded-full border-[3px] border-[#F5A623]/30 px-5 py-2.5"
@@ -406,7 +408,7 @@ export default function Home() {
               </div>
             </div>
           </div>
-        </div>
+        </motion.div>
       </section>
 
       {/* ═══════════════ HERO FEATURE: MULTIMODAL INPUT ═══════════════ */}
