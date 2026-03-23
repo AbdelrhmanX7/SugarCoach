@@ -223,43 +223,84 @@ function parseGlucoseMeasurement(dataView: DataView): BleGlucoseReading | null {
   return { sequenceNumber, timestamp, value, unit, type, sampleLocation };
 }
 
-/**
- * Check if the browser supports reconnecting to previously paired devices
- * (Chrome 85+ via navigator.bluetooth.getDevices).
- */
-export function supportsAutoReconnect(): boolean {
-  return isWebBluetoothSupported() && !!navigator.bluetooth.getDevices;
-}
+// In-memory cache of the last used BluetoothDevice so we can reuse it
+// within the same page session without showing the picker again.
+let cachedDevice: BluetoothDevice | null = null;
 
 /**
- * Try to reconnect to a previously paired glucose meter without showing the picker.
- * Uses navigator.bluetooth.getDevices() (Chrome 85+) to find the stored device
- * and connects directly via GATT.
+ * Try to get a usable device without showing the picker.
  *
- * The connection is kept alive so connectAndReadRecords() can reuse it —
- * calling gatt.connect() on an already-connected device returns the existing server.
+ * Strategy (in order):
+ * 1. Reuse the in-memory cached device from this page session
+ * 2. Use navigator.bluetooth.getDevices() (Chrome 85+) to find a previously
+ *    permitted device and connect via GATT
  *
- * Returns the device if found and connectable, or null if auto-reconnect isn't
- * possible (device not in range, API not supported, no stored device).
+ * Returns the device if found, or null if the user must pick manually.
  */
 export async function tryAutoReconnect(): Promise<BluetoothDevice | null> {
-  if (!supportsAutoReconnect()) return null;
+  // 1. Try the in-memory cached device (same page session)
+  if (cachedDevice?.gatt) {
+    try {
+      // eslint-disable-next-line no-console
+      console.log("[BLE] Trying cached device:", cachedDevice.name);
+
+      await Promise.race([
+        cachedDevice.gatt.connect(),
+        new Promise<never>((_, reject) =>
+          setTimeout(
+            () => reject(new Error("Cached device connect timed out")),
+            GATT_CONNECT_TIMEOUT_MS,
+          ),
+        ),
+      ]);
+
+      // eslint-disable-next-line no-console
+      console.log("[BLE] Cached device connected successfully");
+
+      return cachedDevice;
+    } catch (err) {
+      // eslint-disable-next-line no-console
+      console.log("[BLE] Cached device failed:", err);
+      cachedDevice = null;
+    }
+  }
+
+  // 2. Try getDevices() for cross-session reconnect
+  if (!isWebBluetoothSupported() || !navigator.bluetooth.getDevices) {
+    // eslint-disable-next-line no-console
+    console.log("[BLE] getDevices() not supported in this browser");
+
+    return null;
+  }
 
   const storedId =
     typeof window !== "undefined" ? localStorage.getItem(LS_DEVICE_ID) : null;
 
-  if (!storedId) return null;
+  if (!storedId) {
+    // eslint-disable-next-line no-console
+    console.log("[BLE] No stored device ID found");
 
-  const devices = await navigator.bluetooth.getDevices!();
-  const device = devices.find((d) => d.id === storedId);
+    return null;
+  }
 
-  if (!device || !device.gatt) return null;
-
-  // Try direct GATT connect — works when the device is in range and bonded at OS level.
-  // We intentionally do NOT disconnect here: connectAndReadRecords() will reuse the
-  // existing connection (calling connect() on an already-connected device returns the
-  // current server) and handles its own disconnect in its finally block.
   try {
+    const devices = await navigator.bluetooth.getDevices!();
+
+    // eslint-disable-next-line no-console
+    console.log(
+      "[BLE] getDevices() returned:",
+      devices.map((d) => `${d.name} (${d.id})`),
+    );
+
+    const device = devices.find((d) => d.id === storedId);
+
+    if (!device || !device.gatt) {
+      // eslint-disable-next-line no-console
+      console.log("[BLE] Stored device not found in permitted devices");
+
+      return null;
+    }
+
     await Promise.race([
       device.gatt.connect(),
       new Promise<never>((_, reject) =>
@@ -270,15 +311,23 @@ export async function tryAutoReconnect(): Promise<BluetoothDevice | null> {
       ),
     ]);
 
+    // eslint-disable-next-line no-console
+    console.log("[BLE] getDevices() reconnect successful:", device.name);
+    cachedDevice = device;
+
     return device;
-  } catch {
+  } catch (err) {
+    // eslint-disable-next-line no-console
+    console.log("[BLE] getDevices() reconnect failed:", err);
+
     return null;
   }
 }
 
 /**
  * Open the browser BLE device picker filtered to glucose meters.
- * Saves device name and ID to localStorage for auto-reconnect.
+ * Saves device name and ID to localStorage and caches the device in memory
+ * so subsequent syncs in the same session skip the picker.
  */
 export async function requestGlucoseMeter(): Promise<BluetoothDevice> {
   const device = await navigator.bluetooth.requestDevice({
@@ -290,6 +339,7 @@ export async function requestGlucoseMeter(): Promise<BluetoothDevice> {
     localStorage.setItem(LS_DEVICE_NAME, device.name);
   }
   localStorage.setItem(LS_DEVICE_ID, device.id);
+  cachedDevice = device;
 
   return device;
 }
