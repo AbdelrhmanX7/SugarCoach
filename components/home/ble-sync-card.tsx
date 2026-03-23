@@ -1,6 +1,14 @@
 "use client";
 
 import { useState, useEffect, useCallback, useRef } from "react";
+import { Button } from "@heroui/button";
+import {
+  Modal,
+  ModalBody,
+  ModalContent,
+  ModalFooter,
+  ModalHeader,
+} from "@heroui/modal";
 import { Spinner } from "@heroui/spinner";
 import { HugeiconsIcon } from "@hugeicons/react";
 import {
@@ -47,6 +55,8 @@ export function BleSyncCard({ onSyncComplete }: BleSyncCardProps) {
   const [deviceName, setDeviceName] = useState<string | null>(null);
   const [lastSync, setLastSync] = useState<string | null>(null);
   const [message, setMessage] = useState<string | null>(null);
+  const [errorDetail, setErrorDetail] = useState<string | null>(null);
+  const [errorModalOpen, setErrorModalOpen] = useState(false);
   const clearTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
@@ -63,12 +73,20 @@ export function BleSyncCard({ onSyncComplete }: BleSyncCardProps) {
     }, delayMs);
   }, []);
 
+  const showError = useCallback((shortMsg: string, fullDetail: string) => {
+    setStatus("error");
+    setMessage(shortMsg);
+    setErrorDetail(fullDetail);
+    setErrorModalOpen(true);
+  }, []);
+
   const handleSync = useCallback(async () => {
     if (status === "connecting" || status === "syncing") return;
 
     try {
       setStatus("connecting");
       setMessage(null);
+      setErrorDetail(null);
 
       // Always request device (Web Bluetooth requires user gesture per session)
       const device = await requestGlucoseMeter();
@@ -97,9 +115,10 @@ export function BleSyncCard({ onSyncComplete }: BleSyncCardProps) {
       );
 
       if (!result.success) {
-        setStatus("error");
-        setMessage(result.error ?? "Failed to save readings");
-        clearMessage(5000);
+        showError(
+          "Save failed",
+          `Server action error: ${result.error ?? "Unknown error"}`,
+        );
 
         return;
       }
@@ -126,26 +145,24 @@ export function BleSyncCard({ onSyncComplete }: BleSyncCardProps) {
         return;
       }
 
-      setStatus("error");
-
       // eslint-disable-next-line no-console
       console.error("BLE sync error:", err);
 
-      if (err instanceof Error) {
-        if (err.message.includes("timed out")) {
-          setMessage("Connection timed out");
-        } else if (err.message.includes("GATT")) {
-          setMessage("Connection lost");
-        } else {
-          setMessage(err.message);
-        }
-      } else {
-        setMessage("Could not connect");
-      }
+      const fullError =
+        err instanceof Error
+          ? `${err.name}: ${err.message}\n\n${err.stack ?? ""}`
+          : String(err);
 
-      clearMessage(5000);
+      const shortMsg =
+        err instanceof Error
+          ? err.message.length > 30
+            ? err.message.slice(0, 30) + "..."
+            : err.message
+          : "Connection failed";
+
+      showError(shortMsg, fullError);
     }
-  }, [status, onSyncComplete, clearMessage]);
+  }, [status, onSyncComplete, clearMessage, showError]);
 
   // Cleanup timer on unmount
   useEffect(() => {
@@ -159,76 +176,107 @@ export function BleSyncCard({ onSyncComplete }: BleSyncCardProps) {
   const isLoading = status === "connecting" || status === "syncing";
 
   return (
-    <button
-      className="flex flex-col items-center gap-1.5 rounded-xl px-3 py-2 transition-colors hover:bg-default-100"
-      disabled={isLoading}
-      type="button"
-      onClick={handleSync}
-    >
-      <div className="relative flex h-9 w-9 items-center justify-center rounded-lg bg-blue-500/10">
-        {isLoading ? (
-          <Spinner color="primary" size="sm" />
-        ) : status === "success" ? (
-          <HugeiconsIcon
-            className="text-success"
-            color="currentColor"
-            icon={CheckmarkCircle02Icon}
-            size={18}
-            strokeWidth={1.8}
-          />
-        ) : status === "error" ? (
-          <HugeiconsIcon
-            className="text-danger"
-            color="currentColor"
-            icon={Alert02Icon}
-            size={18}
-            strokeWidth={1.8}
-          />
-        ) : deviceName ? (
-          <HugeiconsIcon
-            className="text-blue-500"
-            color="currentColor"
-            icon={BluetoothIcon}
-            size={18}
-            strokeWidth={1.8}
-          />
+    <>
+      <button
+        className="flex flex-col items-center gap-1.5 rounded-xl px-3 py-2 transition-colors hover:bg-default-100"
+        disabled={isLoading}
+        type="button"
+        onClick={handleSync}
+      >
+        <div className="relative flex h-9 w-9 items-center justify-center rounded-lg bg-blue-500/10">
+          {isLoading ? (
+            <Spinner color="primary" size="sm" />
+          ) : status === "success" ? (
+            <HugeiconsIcon
+              className="text-success"
+              color="currentColor"
+              icon={CheckmarkCircle02Icon}
+              size={18}
+              strokeWidth={1.8}
+            />
+          ) : status === "error" ? (
+            <HugeiconsIcon
+              className="text-danger"
+              color="currentColor"
+              icon={Alert02Icon}
+              size={18}
+              strokeWidth={1.8}
+            />
+          ) : deviceName ? (
+            <HugeiconsIcon
+              className="text-blue-500"
+              color="currentColor"
+              icon={BluetoothIcon}
+              size={18}
+              strokeWidth={1.8}
+            />
+          ) : (
+            <HugeiconsIcon
+              className="text-blue-500"
+              color="currentColor"
+              icon={BluetoothNotConnectedIcon}
+              size={18}
+              strokeWidth={1.8}
+            />
+          )}
+        </div>
+
+        {message ? (
+          <span
+            className={`max-w-[100px] truncate text-[10px] font-medium ${
+              status === "error" ? "text-danger" : "text-success"
+            }`}
+          >
+            {message}
+          </span>
         ) : (
-          <HugeiconsIcon
-            className="text-blue-500"
-            color="currentColor"
-            icon={BluetoothNotConnectedIcon}
-            size={18}
-            strokeWidth={1.8}
-          />
+          <span className="max-w-[80px] truncate text-xs font-medium text-default-500">
+            {isLoading
+              ? status === "connecting"
+                ? "Connecting..."
+                : "Syncing..."
+              : deviceName
+                ? "Sync"
+                : "Connect"}
+          </span>
         )}
-      </div>
 
-      {message ? (
-        <span
-          className={`max-w-[120px] truncate text-[10px] font-medium ${
-            status === "error" ? "text-danger" : "text-success"
-          }`}
-          title={message}
-        >
-          {message}
-        </span>
-      ) : (
-        <span className="max-w-[80px] truncate text-xs font-medium text-default-500">
-          {isLoading
-            ? status === "connecting"
-              ? "Connecting..."
-              : "Syncing..."
-            : deviceName
-              ? "Sync"
-              : "Connect"}
-        </span>
-      )}
+        {!message && lastSync && status === "idle" && (
+          <span className="-mt-1 text-[9px] text-default-400">
+            {formatLastSync(lastSync)}
+          </span>
+        )}
+      </button>
 
-      {!message && lastSync && status === "idle" && (
-        <span className="-mt-1 text-[9px] text-default-400">
-          {formatLastSync(lastSync)}
-        </span>
-      )}
-    </button>
+      {/* Error detail modal */}
+      <Modal
+        isOpen={errorModalOpen}
+        placement="center"
+        onClose={() => {
+          setErrorModalOpen(false);
+          clearMessage(0);
+        }}
+      >
+        <ModalContent>
+          <ModalHeader className="text-danger">Sync Error</ModalHeader>
+          <ModalBody>
+            <pre className="whitespace-pre-wrap break-all rounded-lg bg-default-100 p-3 text-xs text-default-700">
+              {errorDetail}
+            </pre>
+          </ModalBody>
+          <ModalFooter>
+            <Button
+              color="primary"
+              onPress={() => {
+                setErrorModalOpen(false);
+                clearMessage(0);
+              }}
+            >
+              Close
+            </Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
+    </>
   );
 }
