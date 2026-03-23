@@ -133,11 +133,13 @@ export async function saveBleReadings(
         // eslint-disable-next-line no-console
         console.error("Error inserting BLE readings batch:", error);
 
+        const sampleRow = JSON.stringify(batch[0]);
+
         return {
           success: false,
           saved: 0,
           duplicates,
-          error: "Failed to save readings",
+          error: `DB insert failed: ${error.message} (code: ${error.code}, details: ${error.details}, hint: ${error.hint})\n\nSample row: ${sampleRow}`,
         };
       }
     }
@@ -154,7 +156,7 @@ export async function saveBleReadings(
       success: false,
       saved: 0,
       duplicates: 0,
-      error: "Something went wrong",
+      error: `Unexpected: ${err instanceof Error ? err.message : String(err)}`,
     };
   }
 }
