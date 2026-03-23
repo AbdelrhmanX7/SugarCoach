@@ -21,6 +21,7 @@ import {
 } from "@hugeicons/core-free-icons";
 
 import { BloodSugarChart } from "@/components/tracking/blood-sugar-chart";
+import { BleSyncCard } from "@/components/home/ble-sync-card";
 import { QuickLogTabs } from "@/components/home/quick-log-tabs";
 import { DietDrawer } from "@/components/home/diet-drawer";
 import { ImportDrawer } from "@/components/home/import-drawer";
@@ -360,6 +361,7 @@ export default function DashboardHome() {
 
             return <div key={item.key}>{inner}</div>;
           })}
+          <BleSyncCard onSyncComplete={fetchData} />
         </div>
       </div>
 
