@@ -12,6 +12,13 @@
     --font-mono: var(--font-mono), "Fira Code", monospace;
 }
 
+/* Text selection styling */
+::selection {
+  background: rgba(245, 166, 35, 0.3);
+  color: #2D2A26;
+  -webkit-background-clip: text;
+}
+
 /* Cursor pointer on all interactive elements */
 button,
 [role="button"],
