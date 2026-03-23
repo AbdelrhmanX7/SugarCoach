@@ -45,19 +45,7 @@ interface BluetoothDevice extends EventTarget {
   id: string;
   name: string | null;
   gatt: BluetoothRemoteGATTServer | null;
-  watchAdvertisements?(options?: WatchAdvertisementsOptions): Promise<void>;
   forget?(): Promise<void>;
-}
-
-interface WatchAdvertisementsOptions {
-  signal?: AbortSignal;
-}
-
-interface BluetoothAdvertisingEvent extends Event {
-  device: BluetoothDevice;
-  uuids: string[];
-  name?: string;
-  rssi?: number;
 }
 
 interface Bluetooth extends EventTarget {

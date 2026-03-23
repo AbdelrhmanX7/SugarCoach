@@ -234,7 +234,10 @@ export function supportsAutoReconnect(): boolean {
 /**
  * Try to reconnect to a previously paired glucose meter without showing the picker.
  * Uses navigator.bluetooth.getDevices() (Chrome 85+) to find the stored device
- * and watchAdvertisements() to detect when it's in range.
+ * and connects directly via GATT.
+ *
+ * The connection is kept alive so connectAndReadRecords() can reuse it —
+ * calling gatt.connect() on an already-connected device returns the existing server.
  *
  * Returns the device if found and connectable, or null if auto-reconnect isn't
  * possible (device not in range, API not supported, no stored device).
@@ -252,42 +255,10 @@ export async function tryAutoReconnect(): Promise<BluetoothDevice | null> {
 
   if (!device || !device.gatt) return null;
 
-  // If the device supports watchAdvertisements, use it to detect proximity
-  if (device.watchAdvertisements) {
-    const controller = new AbortController();
-
-    try {
-      // Set up listener first, then start scanning
-      const advertisementPromise = new Promise<BluetoothDevice>((resolve) => {
-        device.addEventListener(
-          "advertisementreceived",
-          () => {
-            controller.abort();
-            resolve(device);
-          },
-          { once: true },
-        );
-      });
-
-      const timeoutPromise = new Promise<null>((resolve) =>
-        setTimeout(() => {
-          controller.abort();
-          resolve(null);
-        }, 5_000),
-      );
-
-      // Start watching — this triggers advertisementreceived events
-      await device.watchAdvertisements({ signal: controller.signal });
-
-      const found = await Promise.race([advertisementPromise, timeoutPromise]);
-
-      if (found) return found;
-    } catch {
-      // watchAdvertisements not supported or failed — try direct connect
-    }
-  }
-
-  // Fallback: attempt direct GATT connect (works if device is already bonded at OS level)
+  // Try direct GATT connect — works when the device is in range and bonded at OS level.
+  // We intentionally do NOT disconnect here: connectAndReadRecords() will reuse the
+  // existing connection (calling connect() on an already-connected device returns the
+  // current server) and handles its own disconnect in its finally block.
   try {
     await Promise.race([
       device.gatt.connect(),
@@ -298,7 +269,6 @@ export async function tryAutoReconnect(): Promise<BluetoothDevice | null> {
         ),
       ),
     ]);
-    device.gatt.disconnect(); // disconnect — we just tested reachability
 
     return device;
   } catch {
