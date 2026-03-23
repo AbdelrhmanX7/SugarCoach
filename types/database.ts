@@ -47,7 +47,7 @@ export type BloodSugarReading = {
     | "bedtime"
     | "other"
     | null;
-  source: "manual" | "libre" | "dexcom" | "mysugr" | "ai_chat";
+  source: "manual" | "libre" | "dexcom" | "mysugr" | "ai_chat" | "accu_chek";
   notes: string | null;
   created_at: string;
 };
