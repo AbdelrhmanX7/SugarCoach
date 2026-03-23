@@ -20,8 +20,6 @@ import {
   UserGroupIcon,
 } from "@hugeicons/core-free-icons";
 
-import SplashCursor from "@/components/ui/splash-cursor";
-
 /* ── Scroll-reveal ── */
 function Reveal({
   children,
@@ -151,14 +149,6 @@ function ClayIcon({
 
 /* ── Page ── */
 export default function Home() {
-  const [reducedMotion, setReducedMotion] = useState(false);
-
-  useEffect(() => {
-    setReducedMotion(
-      window.matchMedia("(prefers-reduced-motion: reduce)").matches,
-    );
-  }, []);
-
   const heroRef = useRef<HTMLElement>(null);
   const blob1 = useRef<HTMLDivElement>(null);
   const blob2 = useRef<HTMLDivElement>(null);
@@ -187,22 +177,6 @@ export default function Home() {
 
   return (
     <div className="flex flex-col" style={{ background: "#FFF8F0" }}>
-      {/* Fluid mouse trail — disabled for motion-sensitive users */}
-      {!reducedMotion && (
-        <SplashCursor
-          BACK_COLOR={{ r: 0, g: 0, b: 0 }}
-          COLOR_UPDATE_SPEED={6}
-          CURL={2}
-          DENSITY_DISSIPATION={4}
-          DYE_RESOLUTION={1024}
-          PRESSURE={0.15}
-          SPLAT_FORCE={4000}
-          SPLAT_RADIUS={0.15}
-          TRANSPARENT={true}
-          VELOCITY_DISSIPATION={3}
-        />
-      )}
-
       {/* ═══════════════ HERO ═══════════════ */}
       <section
         ref={heroRef}
