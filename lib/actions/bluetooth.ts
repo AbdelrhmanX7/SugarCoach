@@ -96,7 +96,7 @@ export async function saveBleReadings(
     const existingKeys = new Set(
       (existing ?? []).map(
         (r: { reading_time: string; value: number; unit: string }) =>
-          `${r.reading_time}|${r.value}|${r.unit}`,
+          `${new Date(r.reading_time).toISOString()}|${r.value}|${r.unit}`,
       ),
     );
 
