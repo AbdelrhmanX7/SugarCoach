@@ -50,6 +50,7 @@ export interface BleGlucoseReading {
 }
 
 const LS_DEVICE_NAME = "ble_device_name";
+const LS_DEVICE_ID = "ble_device_id";
 const LS_LAST_SYNC = "ble_last_sync";
 
 export function isWebBluetoothSupported(): boolean {
@@ -71,6 +72,7 @@ export function getLastSyncTime(): string | null {
 export function clearStoredDevice(): void {
   if (typeof window === "undefined") return;
   localStorage.removeItem(LS_DEVICE_NAME);
+  localStorage.removeItem(LS_DEVICE_ID);
   localStorage.removeItem(LS_LAST_SYNC);
 }
 
@@ -222,8 +224,91 @@ function parseGlucoseMeasurement(dataView: DataView): BleGlucoseReading | null {
 }
 
 /**
+ * Check if the browser supports reconnecting to previously paired devices
+ * (Chrome 85+ via navigator.bluetooth.getDevices).
+ */
+export function supportsAutoReconnect(): boolean {
+  return isWebBluetoothSupported() && !!navigator.bluetooth.getDevices;
+}
+
+/**
+ * Try to reconnect to a previously paired glucose meter without showing the picker.
+ * Uses navigator.bluetooth.getDevices() (Chrome 85+) to find the stored device
+ * and watchAdvertisements() to detect when it's in range.
+ *
+ * Returns the device if found and connectable, or null if auto-reconnect isn't
+ * possible (device not in range, API not supported, no stored device).
+ */
+export async function tryAutoReconnect(): Promise<BluetoothDevice | null> {
+  if (!supportsAutoReconnect()) return null;
+
+  const storedId =
+    typeof window !== "undefined" ? localStorage.getItem(LS_DEVICE_ID) : null;
+
+  if (!storedId) return null;
+
+  const devices = await navigator.bluetooth.getDevices!();
+  const device = devices.find((d) => d.id === storedId);
+
+  if (!device || !device.gatt) return null;
+
+  // If the device supports watchAdvertisements, use it to detect proximity
+  if (device.watchAdvertisements) {
+    const controller = new AbortController();
+
+    try {
+      // Set up listener first, then start scanning
+      const advertisementPromise = new Promise<BluetoothDevice>((resolve) => {
+        device.addEventListener(
+          "advertisementreceived",
+          () => {
+            controller.abort();
+            resolve(device);
+          },
+          { once: true },
+        );
+      });
+
+      const timeoutPromise = new Promise<null>((resolve) =>
+        setTimeout(() => {
+          controller.abort();
+          resolve(null);
+        }, 5_000),
+      );
+
+      // Start watching — this triggers advertisementreceived events
+      await device.watchAdvertisements({ signal: controller.signal });
+
+      const found = await Promise.race([advertisementPromise, timeoutPromise]);
+
+      if (found) return found;
+    } catch {
+      // watchAdvertisements not supported or failed — try direct connect
+    }
+  }
+
+  // Fallback: attempt direct GATT connect (works if device is already bonded at OS level)
+  try {
+    await Promise.race([
+      device.gatt.connect(),
+      new Promise<never>((_, reject) =>
+        setTimeout(
+          () => reject(new Error("Auto-reconnect timed out")),
+          GATT_CONNECT_TIMEOUT_MS,
+        ),
+      ),
+    ]);
+    device.gatt.disconnect(); // disconnect — we just tested reachability
+
+    return device;
+  } catch {
+    return null;
+  }
+}
+
+/**
  * Open the browser BLE device picker filtered to glucose meters.
- * Saves device name to localStorage.
+ * Saves device name and ID to localStorage for auto-reconnect.
  */
 export async function requestGlucoseMeter(): Promise<BluetoothDevice> {
   const device = await navigator.bluetooth.requestDevice({
@@ -234,6 +319,7 @@ export async function requestGlucoseMeter(): Promise<BluetoothDevice> {
   if (device.name) {
     localStorage.setItem(LS_DEVICE_NAME, device.name);
   }
+  localStorage.setItem(LS_DEVICE_ID, device.id);
 
   return device;
 }

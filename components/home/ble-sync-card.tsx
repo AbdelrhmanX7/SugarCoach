@@ -24,6 +24,7 @@ import {
   getLastSyncTime,
   requestGlucoseMeter,
   connectAndReadRecords,
+  tryAutoReconnect,
 } from "@/lib/bluetooth/glucose-service";
 import { saveBleReadings } from "@/lib/actions/bluetooth";
 
@@ -80,17 +81,8 @@ export function BleSyncCard({ onSyncComplete }: BleSyncCardProps) {
     setErrorModalOpen(true);
   }, []);
 
-  const handleSync = useCallback(async () => {
-    if (status === "connecting" || status === "syncing") return;
-
-    try {
-      setStatus("connecting");
-      setMessage(null);
-      setErrorDetail(null);
-
-      // Always request device (Web Bluetooth requires user gesture per session)
-      const device = await requestGlucoseMeter();
-
+  const syncWithDevice = useCallback(
+    async (device: BluetoothDevice) => {
       setDeviceName(device.name ?? "Glucose Meter");
       setStatus("syncing");
 
@@ -137,6 +129,23 @@ export function BleSyncCard({ onSyncComplete }: BleSyncCardProps) {
 
       clearMessage(3000);
       onSyncComplete?.();
+    },
+    [onSyncComplete, clearMessage, showError],
+  );
+
+  const handleSync = useCallback(async () => {
+    if (status === "connecting" || status === "syncing") return;
+
+    try {
+      setStatus("connecting");
+      setMessage(null);
+      setErrorDetail(null);
+
+      // Try auto-reconnect to previously paired device first
+      const remembered = await tryAutoReconnect();
+      const device = remembered ?? (await requestGlucoseMeter());
+
+      await syncWithDevice(device);
     } catch (err) {
       // User cancelled the BLE picker — not an error
       if (err instanceof DOMException && err.name === "NotFoundError") {
@@ -162,7 +171,31 @@ export function BleSyncCard({ onSyncComplete }: BleSyncCardProps) {
 
       showError(shortMsg, fullError);
     }
-  }, [status, onSyncComplete, clearMessage, showError]);
+  }, [status, syncWithDevice, showError]);
+
+  // Auto-sync on mount: reconnect to previously paired device without user interaction
+  const autoSyncAttempted = useRef(false);
+
+  useEffect(() => {
+    if (autoSyncAttempted.current || !supported) return;
+    autoSyncAttempted.current = true;
+
+    (async () => {
+      try {
+        const device = await tryAutoReconnect();
+
+        if (!device) return;
+
+        setStatus("connecting");
+        setMessage(null);
+        setErrorDetail(null);
+        await syncWithDevice(device);
+      } catch {
+        // Auto-sync is best-effort — silently fail
+        setStatus("idle");
+      }
+    })();
+  }, [supported, syncWithDevice]);
 
   // Cleanup timer on unmount
   useEffect(() => {
