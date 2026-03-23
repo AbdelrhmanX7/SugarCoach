@@ -13,9 +13,9 @@
 }
 
 /* Text selection styling */
-::selection {
-  background: #F5A623;
-  color: #FFFFFF;
+*::selection {
+  background: #F5A623 !important;
+  color: #FFFFFF !important;
 }
 
 /* Cursor pointer on all interactive elements */
