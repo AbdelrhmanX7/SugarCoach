@@ -128,18 +128,19 @@ export function BleSyncCard({ onSyncComplete }: BleSyncCardProps) {
 
       setStatus("error");
 
+      // eslint-disable-next-line no-console
+      console.error("BLE sync error:", err);
+
       if (err instanceof Error) {
         if (err.message.includes("timed out")) {
-          setMessage("Connection timed out. Please try again");
+          setMessage("Connection timed out");
         } else if (err.message.includes("GATT")) {
-          setMessage("Connection lost. Please try again");
+          setMessage("Connection lost");
         } else {
-          setMessage(
-            "Could not connect. Make sure your meter is nearby and Bluetooth is on",
-          );
+          setMessage(err.message);
         }
       } else {
-        setMessage("Could not connect. Please try again");
+        setMessage("Could not connect");
       }
 
       clearMessage(5000);
@@ -204,9 +205,10 @@ export function BleSyncCard({ onSyncComplete }: BleSyncCardProps) {
 
       {message ? (
         <span
-          className={`max-w-[80px] truncate text-[10px] font-medium ${
+          className={`max-w-[120px] truncate text-[10px] font-medium ${
             status === "error" ? "text-danger" : "text-success"
           }`}
+          title={message}
         >
           {message}
         </span>
