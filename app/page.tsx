@@ -17,6 +17,7 @@ import {
   StarsIcon,
   Target01Icon,
   Upload02Icon,
+  UserGroupIcon,
 } from "@hugeicons/core-free-icons";
 
 import SplashCursor from "@/components/ui/splash-cursor";
@@ -56,53 +57,11 @@ function Reveal({
   return (
     <div
       ref={ref}
-      className={`transition-all duration-700 ease-out ${v ? "translate-y-0 opacity-100" : "translate-y-6 opacity-0"} ${className}`}
+      className={`transition-[opacity,transform] duration-700 ease-out ${v ? "translate-y-0 opacity-100" : "translate-y-6 opacity-0"} ${className}`}
       style={{ transitionDelay: `${delay}ms` }}
     >
       {children}
     </div>
-  );
-}
-
-/* ── Count-up ── */
-function Counter({ end, suffix = "" }: { end: number; suffix?: string }) {
-  const ref = useRef<HTMLSpanElement>(null);
-  const [val, setVal] = useState(0);
-  const ran = useRef(false);
-
-  useEffect(() => {
-    const el = ref.current;
-
-    if (!el) return;
-    const ob = new IntersectionObserver(
-      ([e]) => {
-        if (e.isIntersecting && !ran.current) {
-          ran.current = true;
-          const dur = 1200;
-          const t0 = performance.now();
-          const tick = (now: number) => {
-            const p = Math.min((now - t0) / dur, 1);
-
-            setVal(Math.round((1 - Math.pow(1 - p, 3)) * end));
-            if (p < 1) requestAnimationFrame(tick);
-          };
-
-          requestAnimationFrame(tick);
-        }
-      },
-      { threshold: 0.5 },
-    );
-
-    ob.observe(el);
-
-    return () => ob.disconnect();
-  }, [end]);
-
-  return (
-    <span ref={ref}>
-      {val.toLocaleString()}
-      {suffix}
-    </span>
   );
 }
 
@@ -117,7 +76,7 @@ function ClayButton({
   variant?: "primary" | "secondary";
 }) {
   const base =
-    "relative block rounded-[20px] px-8 py-4 font-display text-lg font-bold text-center transition-all duration-200 active:scale-[0.97] active:translate-y-0.5";
+    "relative block rounded-[20px] px-8 py-4 font-display text-lg font-bold text-center touch-manipulation transition-[transform,box-shadow] duration-200 active:scale-[0.97] active:translate-y-0.5";
   const styles =
     variant === "primary"
       ? `${base} bg-[#F5A623] text-white border-[3px] border-[#D98E1B] shadow-[0_6px_0_#C17D15,0_8px_20px_rgba(245,166,35,0.3)] hover:shadow-[0_4px_0_#C17D15,0_6px_16px_rgba(245,166,35,0.35)] hover:translate-y-[2px]`
@@ -144,7 +103,7 @@ function ClayCard({
 }) {
   return (
     <div
-      className={`rounded-[24px] border-[3px] p-6 transition-all duration-300 hover:-translate-y-1 ${className}`}
+      className={`rounded-[24px] border-[3px] p-6 touch-manipulation transition-[transform,box-shadow] duration-300 hover:-translate-y-1 ${className}`}
       style={{
         background: color,
         borderColor,
@@ -179,19 +138,39 @@ function ClayIcon({
         boxShadow: `0 3px 0 ${border}`,
       }}
     >
-      <HugeiconsIcon color={color} icon={icon} size={size} strokeWidth={2} />
+      <HugeiconsIcon
+        aria-hidden="true"
+        color={color}
+        icon={icon}
+        size={size}
+        strokeWidth={2}
+      />
     </div>
   );
 }
 
 /* ── Page ── */
 export default function Home() {
+  const [reducedMotion, setReducedMotion] = useState(false);
+
+  useEffect(() => {
+    setReducedMotion(
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches,
+    );
+  }, []);
+
   const heroRef = useRef<HTMLElement>(null);
   const blob1 = useRef<HTMLDivElement>(null);
   const blob2 = useRef<HTMLDivElement>(null);
   const blob3 = useRef<HTMLDivElement>(null);
 
+  const lastMove = useRef(0);
   const handleHeroMouse = useCallback((e: React.MouseEvent) => {
+    const now = performance.now();
+
+    if (now - lastMove.current < 32) return; // ~30fps throttle
+    lastMove.current = now;
+
     const rect = heroRef.current?.getBoundingClientRect();
 
     if (!rect) return;
@@ -208,19 +187,21 @@ export default function Home() {
 
   return (
     <div className="flex flex-col" style={{ background: "#FFF8F0" }}>
-      {/* Fluid mouse trail */}
-      <SplashCursor
-        BACK_COLOR={{ r: 0, g: 0, b: 0 }}
-        COLOR_UPDATE_SPEED={6}
-        CURL={2}
-        DENSITY_DISSIPATION={4}
-        DYE_RESOLUTION={1024}
-        PRESSURE={0.15}
-        SPLAT_FORCE={4000}
-        SPLAT_RADIUS={0.15}
-        TRANSPARENT={true}
-        VELOCITY_DISSIPATION={3}
-      />
+      {/* Fluid mouse trail — disabled for motion-sensitive users */}
+      {!reducedMotion && (
+        <SplashCursor
+          BACK_COLOR={{ r: 0, g: 0, b: 0 }}
+          COLOR_UPDATE_SPEED={6}
+          CURL={2}
+          DENSITY_DISSIPATION={4}
+          DYE_RESOLUTION={1024}
+          PRESSURE={0.15}
+          SPLAT_FORCE={4000}
+          SPLAT_RADIUS={0.15}
+          TRANSPARENT={true}
+          VELOCITY_DISSIPATION={3}
+        />
+      )}
 
       {/* ═══════════════ HERO ═══════════════ */}
       <section
@@ -258,6 +239,7 @@ export default function Home() {
               }}
             >
               <svg
+                aria-hidden="true"
                 className="h-7 w-7 text-[#F5A623]"
                 fill="none"
                 stroke="currentColor"
@@ -327,6 +309,7 @@ export default function Home() {
               </div>
               <div className="mt-1.5 flex items-center gap-1 text-xs font-bold text-[#43A047]">
                 <svg
+                  aria-hidden="true"
                   className="h-3.5 w-3.5"
                   fill="none"
                   stroke="currentColor"
@@ -351,6 +334,7 @@ export default function Home() {
               <div className="mb-2 flex items-center gap-2">
                 <div className="flex h-7 w-7 items-center justify-center rounded-full border-2 border-[#BA68C8] bg-[#E1BEE7]">
                   <HugeiconsIcon
+                    aria-hidden="true"
                     className="text-[#7B1FA2]"
                     color="currentColor"
                     icon={AiChat02Icon}
@@ -404,6 +388,7 @@ export default function Home() {
               <div className="flex items-center gap-3">
                 <div className="flex h-10 w-10 items-center justify-center rounded-[14px] border-2 border-[#FFB74D] bg-[#FFE0B2]">
                   <HugeiconsIcon
+                    aria-hidden="true"
                     className="text-[#E65100]"
                     color="currentColor"
                     icon={ChampionIcon}
@@ -441,7 +426,7 @@ export default function Home() {
                 >
                   No other diabetes app does this
                 </div>
-                <h2 className="mb-4 font-display text-3xl font-extrabold text-[#2D2A26] sm:text-4xl">
+                <h2 className="mb-4 font-display text-3xl font-extrabold text-[#2D2A26] [text-wrap:balance] sm:text-4xl">
                   Three ways to log.
                   <br />
                   Zero friction.
@@ -484,6 +469,7 @@ export default function Home() {
                         style={{ background: t.glow }}
                       >
                         <HugeiconsIcon
+                          aria-hidden="true"
                           color={t.color}
                           icon={t.icon}
                           size={11}
@@ -506,6 +492,7 @@ export default function Home() {
                   <div className="mb-3 flex items-center gap-2">
                     <div className="flex h-8 w-8 items-center justify-center rounded-full border-2 border-[#BA68C8] bg-[#E1BEE7]">
                       <HugeiconsIcon
+                        aria-hidden="true"
                         color="#7B1FA2"
                         icon={AiChat02Icon}
                         size={14}
@@ -568,7 +555,7 @@ export default function Home() {
                   color="#1565C0"
                   icon={Camera01Icon}
                 />
-                <h2 className="mb-4 mt-5 font-display text-3xl font-extrabold text-[#2D2A26] sm:text-4xl">
+                <h2 className="mb-4 mt-5 font-display text-3xl font-extrabold text-[#2D2A26] [text-wrap:balance] sm:text-4xl">
                   Snap your plate.
                   <br />
                   We count the carbs.
@@ -598,6 +585,7 @@ export default function Home() {
                   <div className="mb-4 flex h-32 items-center justify-center rounded-xl border-[2px] border-[#90CAF9] bg-white">
                     <div className="text-center">
                       <HugeiconsIcon
+                        aria-hidden="true"
                         color="#90CAF9"
                         icon={Camera01Icon}
                         size={32}
@@ -654,7 +642,7 @@ export default function Home() {
                   color="#1565C0"
                   icon={BluetoothIcon}
                 />
-                <h2 className="mb-4 mt-5 font-display text-3xl font-extrabold text-[#2D2A26] sm:text-4xl">
+                <h2 className="mb-4 mt-5 font-display text-3xl font-extrabold text-[#2D2A26] [text-wrap:balance] sm:text-4xl">
                   Your meter syncs.
                   <br />
                   You do nothing.
@@ -721,6 +709,7 @@ export default function Home() {
                           style={{ borderColor: d.border }}
                         >
                           <HugeiconsIcon
+                            aria-hidden="true"
                             color={d.statusColor}
                             icon={d.icon}
                             size={18}
@@ -740,6 +729,7 @@ export default function Home() {
                         </div>
                       </div>
                       <svg
+                        aria-hidden="true"
                         className="h-4 w-4 text-[#D4CFC8]"
                         fill="none"
                         stroke="currentColor"
@@ -770,7 +760,7 @@ export default function Home() {
                   color="#E65100"
                   icon={Restaurant01Icon}
                 />
-                <h2 className="mb-4 mt-5 font-display text-3xl font-extrabold text-[#2D2A26] sm:text-4xl">
+                <h2 className="mb-4 mt-5 font-display text-3xl font-extrabold text-[#2D2A26] [text-wrap:balance] sm:text-4xl">
                   Meal plans built
                   <br />
                   around <em>your</em> ratio.
@@ -867,7 +857,7 @@ export default function Home() {
                   color="#7B1FA2"
                   icon={ChartLineData02Icon}
                 />
-                <h2 className="mb-4 mt-5 font-display text-3xl font-extrabold text-[#2D2A26] sm:text-4xl">
+                <h2 className="mb-4 mt-5 font-display text-3xl font-extrabold text-[#2D2A26] [text-wrap:balance] sm:text-4xl">
                   See your patterns.
                   <br />
                   Know your A1C.
@@ -958,7 +948,7 @@ export default function Home() {
                   color="#2E7D32"
                   icon={Target01Icon}
                 />
-                <h2 className="mb-4 mt-5 font-display text-3xl font-extrabold text-[#2D2A26] sm:text-4xl">
+                <h2 className="mb-4 mt-5 font-display text-3xl font-extrabold text-[#2D2A26] [text-wrap:balance] sm:text-4xl">
                   It knows your
                   <br />
                   insulin math.
@@ -1026,8 +1016,108 @@ export default function Home() {
         </div>
       </section>
 
+      {/* ═══════════════ FEATURE 7: FAMILY SHARING ═══════════════ */}
+      <section className="px-6 py-28" style={{ background: "#FFFFFF" }}>
+        <div className="mx-auto max-w-5xl">
+          <Reveal>
+            <div className="flex flex-col items-center gap-14 lg:flex-row lg:gap-20">
+              {/* Text */}
+              <div className="flex-1">
+                <ClayIcon
+                  bg="#E3F2FD"
+                  border="#90CAF9"
+                  color="#1565C0"
+                  icon={UserGroupIcon}
+                />
+                <h2 className="mb-4 mt-5 font-display text-3xl font-extrabold text-[#2D2A26] [text-wrap:balance] sm:text-4xl">
+                  Your family stays
+                  <br />
+                  in the loop.
+                </h2>
+                <p className="mb-6 max-w-md text-[15px] leading-relaxed text-[#78716C]">
+                  Add parents, guardians, or siblings as{" "}
+                  <strong>family members</strong>. They can view blood sugar
+                  readings, meal logs, and trends from their own account — so
+                  everyone stays informed without hovering over your shoulder.
+                </p>
+                <p className="max-w-md text-[15px] leading-relaxed text-[#78716C]">
+                  Perfect for parents managing their child&apos;s diabetes from
+                  a distance, or siblings who want to help out. All data is
+                  protected with <strong>row-level security</strong> — only the
+                  people you choose can see your info.
+                </p>
+              </div>
+
+              {/* Visual: family mockup */}
+              <div className="w-full max-w-xs flex-shrink-0 space-y-3">
+                {[
+                  {
+                    name: "You",
+                    role: "Owner",
+                    border: "#FFCC80",
+                    bg: "#FFF8E1",
+                    roleColor: "#E65100",
+                    initials: "AX",
+                    initialsBg: "#FFE0B2",
+                  },
+                  {
+                    name: "Mom",
+                    role: "Can view & edit",
+                    border: "#CE93D8",
+                    bg: "#F3E5F5",
+                    roleColor: "#7B1FA2",
+                    initials: "SM",
+                    initialsBg: "#E1BEE7",
+                  },
+                  {
+                    name: "Dad",
+                    role: "Can view",
+                    border: "#90CAF9",
+                    bg: "#E3F2FD",
+                    roleColor: "#1565C0",
+                    initials: "MX",
+                    initialsBg: "#BBDEFB",
+                  },
+                ].map((m) => (
+                  <ClayCard
+                    key={m.name}
+                    borderColor={m.border}
+                    className="!p-4"
+                    color={m.bg}
+                  >
+                    <div className="flex items-center gap-3">
+                      <div
+                        className="flex h-10 w-10 items-center justify-center rounded-full border-[2px] font-display text-sm font-bold"
+                        style={{
+                          borderColor: m.border,
+                          background: m.initialsBg,
+                          color: m.roleColor,
+                        }}
+                      >
+                        {m.initials}
+                      </div>
+                      <div>
+                        <div className="text-sm font-bold text-[#2D2A26]">
+                          {m.name}
+                        </div>
+                        <div
+                          className="text-[11px] font-bold"
+                          style={{ color: m.roleColor }}
+                        >
+                          {m.role}
+                        </div>
+                      </div>
+                    </div>
+                  </ClayCard>
+                ))}
+              </div>
+            </div>
+          </Reveal>
+        </div>
+      </section>
+
       {/* ═══════════════ GAMIFICATION SPOTLIGHT ═══════════════ */}
-      <section className="px-6 py-24" style={{ background: "#FFFFFF" }}>
+      <section className="px-6 py-24" style={{ background: "#FFF8F0" }}>
         <div className="mx-auto max-w-4xl">
           <Reveal>
             <div className="flex flex-col items-center gap-12 lg:flex-row lg:gap-16">
@@ -1042,7 +1132,7 @@ export default function Home() {
                 >
                   Why kids actually use it
                 </div>
-                <h2 className="mb-4 font-display text-3xl font-extrabold text-[#2D2A26] sm:text-4xl">
+                <h2 className="mb-4 font-display text-3xl font-extrabold text-[#2D2A26] [text-wrap:balance] sm:text-4xl">
                   Diabetes management
                   <br />
                   that feels like a game.
@@ -1095,6 +1185,7 @@ export default function Home() {
                         }}
                       >
                         <HugeiconsIcon
+                          aria-hidden="true"
                           color={tag.color}
                           icon={tag.icon}
                           size={12}
@@ -1167,63 +1258,6 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ═══════════════ STATS ═══════════════ */}
-      <section className="px-6 py-20" style={{ background: "#FFF8F0" }}>
-        <div className="mx-auto max-w-3xl">
-          <Reveal>
-            <div className="grid grid-cols-2 gap-5 sm:grid-cols-4">
-              {[
-                {
-                  value: 500,
-                  suffix: "+",
-                  label: "Active users",
-                  border: "#CE93D8",
-                  bg: "#F3E5F5",
-                },
-                {
-                  value: 50000,
-                  suffix: "+",
-                  label: "Readings logged",
-                  border: "#90CAF9",
-                  bg: "#E3F2FD",
-                },
-                {
-                  value: 98,
-                  suffix: "%",
-                  label: "In-range accuracy",
-                  border: "#A5D6A7",
-                  bg: "#F1F8E9",
-                },
-                {
-                  value: 4.9,
-                  suffix: "/5",
-                  label: "User rating",
-                  border: "#FFCC80",
-                  bg: "#FFF8E1",
-                },
-              ].map((s) => (
-                <div
-                  key={s.label}
-                  className="rounded-[20px] border-[3px] p-5 text-center"
-                  style={{
-                    borderColor: s.border,
-                    background: s.bg,
-                    boxShadow: `0 5px 0 ${s.border}, inset 0 -2px 4px rgba(0,0,0,0.02)`,
-                  }}
-                >
-                  <div className="font-display text-3xl font-extrabold text-[#2D2A26]">
-                    <Counter end={s.value} suffix={s.suffix} />
-                  </div>
-                  <div className="mt-1 text-[12px] font-bold text-[#A8A29E]">
-                    {s.label}
-                  </div>
-                </div>
-              ))}
-            </div>
-          </Reveal>
-        </div>
-      </section>
-
       {/* ═══════════════ BOTTOM CTA ═══════════════ */}
       <section className="px-6 py-24" style={{ background: "#FFFFFF" }}>
         <Reveal>
@@ -1235,7 +1269,7 @@ export default function Home() {
                 "0 8px 0 #FFE0B2, 0 14px 40px rgba(255,152,0,0.1), inset 0 -2px 6px rgba(0,0,0,0.02)",
             }}
           >
-            <h2 className="mb-3 font-display text-3xl font-extrabold text-[#2D2A26] sm:text-4xl">
+            <h2 className="mb-3 font-display text-3xl font-extrabold text-[#2D2A26] [text-wrap:balance] sm:text-4xl">
               Ready to take control?
             </h2>
             <p className="mx-auto mb-10 max-w-md text-lg text-[#78716C]">
