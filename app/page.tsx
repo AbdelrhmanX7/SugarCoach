@@ -425,224 +425,604 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ═══════════════ HERO FEATURE: MULTIMODAL INPUT ═══════════════ */}
-      <section className="px-6 py-24" style={{ background: "#FFFFFF" }}>
-        <div className="mx-auto max-w-4xl">
+      {/* ═══════════════ FEATURE 1: MULTIMODAL INPUT ═══════════════ */}
+      <section className="px-6 py-28" style={{ background: "#FFFFFF" }}>
+        <div className="mx-auto max-w-5xl">
           <Reveal>
-            <div className="mb-14 text-center">
-              <div
-                className="mx-auto mb-4 inline-block rounded-full border-[3px] border-[#CE93D8] px-4 py-1.5 font-display text-sm font-bold text-[#7B1FA2]"
-                style={{ background: "#F3E5F5", boxShadow: "0 3px 0 #E1BEE7" }}
-              >
-                No other diabetes app does this
+            <div className="flex flex-col items-center gap-14 lg:flex-row lg:gap-20">
+              {/* Text */}
+              <div className="flex-1">
+                <div
+                  className="mb-4 inline-block rounded-full border-[3px] border-[#CE93D8] px-4 py-1.5 font-display text-sm font-bold text-[#7B1FA2]"
+                  style={{
+                    background: "#F3E5F5",
+                    boxShadow: "0 3px 0 #E1BEE7",
+                  }}
+                >
+                  No other diabetes app does this
+                </div>
+                <h2 className="mb-4 font-display text-3xl font-extrabold text-[#2D2A26] sm:text-4xl">
+                  Three ways to log.
+                  <br />
+                  Zero friction.
+                </h2>
+                <p className="mb-6 max-w-md text-[15px] leading-relaxed text-[#78716C]">
+                  Type &ldquo;I had pizza for lunch&rdquo;, snap a photo of your
+                  plate, or just say it out loud. Our AI understands all of it
+                  and creates structured entries — meals, insulin doses, blood
+                  sugar readings — automatically. One message can log{" "}
+                  <em>multiple</em> things at once.
+                </p>
+                <div className="flex flex-wrap gap-2">
+                  {[
+                    {
+                      icon: AiChat02Icon,
+                      label: "Natural Language Chat",
+                      color: "#7B1FA2",
+                      glow: "rgba(123,31,162,0.15)",
+                    },
+                    {
+                      icon: Camera01Icon,
+                      label: "Photo Food Analysis",
+                      color: "#1565C0",
+                      glow: "rgba(21,101,194,0.15)",
+                    },
+                    {
+                      icon: Mic01Icon,
+                      label: "Voice Input",
+                      color: "#2E7D32",
+                      glow: "rgba(46,125,50,0.15)",
+                    },
+                  ].map((t) => (
+                    <span
+                      key={t.label}
+                      className="flex items-center gap-1.5 rounded-full border-[2px] border-[#E8E4DF] px-3 py-1.5 text-[13px] font-bold text-[#2D2A26]"
+                      style={{ background: "#FAFAFA" }}
+                    >
+                      <span
+                        className="flex h-5 w-5 items-center justify-center rounded-full"
+                        style={{ background: t.glow }}
+                      >
+                        <HugeiconsIcon
+                          color={t.color}
+                          icon={t.icon}
+                          size={11}
+                          strokeWidth={2.2}
+                        />
+                      </span>
+                      {t.label}
+                    </span>
+                  ))}
+                </div>
               </div>
-              <h2 className="mb-3 font-display text-3xl font-extrabold text-[#2D2A26] sm:text-4xl">
-                Three ways to log. Zero friction.
-              </h2>
-              <p className="mx-auto max-w-lg text-[15px] leading-relaxed text-[#78716C]">
-                Type &ldquo;I had pizza for lunch&rdquo;, snap a photo of your
-                plate, or just say it out loud. Our AI understands all of it and
-                creates structured entries — meals, insulin, blood sugar —
-                automatically.
-              </p>
+
+              {/* Visual: chat mockup */}
+              <div className="w-full max-w-sm flex-shrink-0">
+                <ClayCard
+                  borderColor="#CE93D8"
+                  className="!p-5"
+                  color="#F3E5F5"
+                >
+                  <div className="mb-3 flex items-center gap-2">
+                    <div className="flex h-8 w-8 items-center justify-center rounded-full border-2 border-[#BA68C8] bg-[#E1BEE7]">
+                      <HugeiconsIcon
+                        color="#7B1FA2"
+                        icon={AiChat02Icon}
+                        size={14}
+                        strokeWidth={2.2}
+                      />
+                    </div>
+                    <span className="font-display text-sm font-bold text-[#4A148C]">
+                      AI Coach
+                    </span>
+                  </div>
+                  {/* User message */}
+                  <div
+                    className="mb-3 ml-auto w-fit rounded-2xl rounded-tr-md border-[2px] border-[#D98E1B] px-4 py-2.5"
+                    style={{ background: "#FFF8E1" }}
+                  >
+                    <p className="text-[13px] font-medium text-[#2D2A26]">
+                      Had 2 slices of pizza and a juice box, sugar was 185 after
+                    </p>
+                  </div>
+                  {/* AI response */}
+                  <div
+                    className="w-fit rounded-2xl rounded-tl-md border-[2px] border-[#BA68C8] px-4 py-2.5"
+                    style={{ background: "#FFFFFF" }}
+                  >
+                    <p className="text-[13px] font-medium text-[#2D2A26]">
+                      Got it! I logged:
+                    </p>
+                    <ul className="mt-1.5 space-y-1 text-[12px] text-[#78716C]">
+                      <li className="flex items-center gap-1.5">
+                        <span className="h-1.5 w-1.5 rounded-full bg-[#F5A623]" />{" "}
+                        Meal: 2 pizza slices + juice box (62g carbs)
+                      </li>
+                      <li className="flex items-center gap-1.5">
+                        <span className="h-1.5 w-1.5 rounded-full bg-[#EF4444]" />{" "}
+                        Blood sugar: 185 mg/dL (after meal)
+                      </li>
+                      <li className="flex items-center gap-1.5">
+                        <span className="h-1.5 w-1.5 rounded-full bg-[#3B82F6]" />{" "}
+                        Suggested dose: 5 units (your 1:12 ratio)
+                      </li>
+                    </ul>
+                  </div>
+                </ClayCard>
+              </div>
             </div>
           </Reveal>
-
-          <div className="grid gap-5 sm:grid-cols-3">
-            <Reveal delay={0}>
-              <ClayCard borderColor="#CE93D8" color="#F3E5F5">
-                <div className="flex flex-col items-center gap-4 text-center">
-                  <ClayIcon
-                    bg="#FFFFFF"
-                    border="#CE93D8"
-                    color="#7B1FA2"
-                    icon={AiChat02Icon}
-                  />
-                  <h3 className="font-display text-xl font-bold text-[#2D2A26]">
-                    Chat
-                  </h3>
-                  <p className="text-[14px] leading-relaxed text-[#78716C]">
-                    &ldquo;Had 2 eggs and toast for breakfast, sugar was 130
-                    before eating&rdquo; — one message logs a meal <em>and</em>{" "}
-                    a reading.
-                  </p>
-                </div>
-              </ClayCard>
-            </Reveal>
-            <Reveal delay={100}>
-              <ClayCard borderColor="#90CAF9" color="#E3F2FD">
-                <div className="flex flex-col items-center gap-4 text-center">
-                  <ClayIcon
-                    bg="#FFFFFF"
-                    border="#90CAF9"
-                    color="#1565C0"
-                    icon={Camera01Icon}
-                  />
-                  <h3 className="font-display text-xl font-bold text-[#2D2A26]">
-                    Snap
-                  </h3>
-                  <p className="text-[14px] leading-relaxed text-[#78716C]">
-                    Take a photo of your food. AI identifies every item,
-                    estimates carbs, protein, fat, and calculates the insulin
-                    dose for you.
-                  </p>
-                </div>
-              </ClayCard>
-            </Reveal>
-            <Reveal delay={200}>
-              <ClayCard borderColor="#A5D6A7" color="#F1F8E9">
-                <div className="flex flex-col items-center gap-4 text-center">
-                  <ClayIcon
-                    bg="#FFFFFF"
-                    border="#A5D6A7"
-                    color="#2E7D32"
-                    icon={Mic01Icon}
-                  />
-                  <h3 className="font-display text-xl font-bold text-[#2D2A26]">
-                    Speak
-                  </h3>
-                  <p className="text-[14px] leading-relaxed text-[#78716C]">
-                    Hands full? Just talk. Voice gets transcribed and parsed
-                    into entries just like chat — perfect when you&apos;re
-                    eating.
-                  </p>
-                </div>
-              </ClayCard>
-            </Reveal>
-          </div>
         </div>
       </section>
 
-      {/* ═══════════════ FEATURE GRID: WHAT SETS US APART ═══════════════ */}
-      <section className="px-6 py-24" style={{ background: "#FFF8F0" }}>
-        <div className="mx-auto max-w-4xl">
+      {/* ═══════════════ FEATURE 2: PHOTO ANALYSIS ═══════════════ */}
+      <section className="px-6 py-28" style={{ background: "#FFF8F0" }}>
+        <div className="mx-auto max-w-5xl">
           <Reveal>
-            <h2 className="mb-3 text-center font-display text-3xl font-extrabold text-[#2D2A26] sm:text-4xl">
-              Built for how you actually live
-            </h2>
-            <p className="mx-auto mb-14 max-w-lg text-center text-[15px] text-[#A8A29E]">
-              Not another form-filling app. SugarCoach connects to your devices,
-              knows your insulin ratio, and keeps you motivated.
-            </p>
-          </Reveal>
+            <div className="flex flex-col items-center gap-14 lg:flex-row-reverse lg:gap-20">
+              {/* Text */}
+              <div className="flex-1">
+                <ClayIcon
+                  bg="#E3F2FD"
+                  border="#90CAF9"
+                  color="#1565C0"
+                  icon={Camera01Icon}
+                />
+                <h2 className="mb-4 mt-5 font-display text-3xl font-extrabold text-[#2D2A26] sm:text-4xl">
+                  Snap your plate.
+                  <br />
+                  We count the carbs.
+                </h2>
+                <p className="max-w-md text-[15px] leading-relaxed text-[#78716C]">
+                  Take a photo of any meal and our AI identifies every item on
+                  your plate —{" "}
+                  <strong>
+                    carbs, protein, fat, fiber, sugar, and calories
+                  </strong>
+                  . It even calculates how much insulin you&apos;d need based on
+                  your personal carb ratio. Works with home-cooked meals,
+                  restaurant plates, packaged snacks — anything.
+                </p>
+              </div>
 
-          <div className="grid gap-6 sm:grid-cols-2">
-            <Reveal delay={0}>
-              <ClayCard
-                borderColor="#90CAF9"
-                className="h-full"
-                color="#E3F2FD"
-              >
-                <div className="flex flex-col gap-4">
-                  <div className="flex items-center gap-3">
-                    <ClayIcon
-                      bg="#FFFFFF"
-                      border="#90CAF9"
-                      color="#1565C0"
-                      icon={BluetoothIcon}
-                    />
-                    <div className="flex gap-2">
-                      <ClayIcon
-                        bg="#FFFFFF"
-                        border="#90CAF9"
-                        color="#1565C0"
-                        icon={Upload02Icon}
-                        size={22}
+              {/* Visual: nutrition breakdown mockup */}
+              <div className="w-full max-w-sm flex-shrink-0">
+                <ClayCard
+                  borderColor="#90CAF9"
+                  className="!p-5"
+                  color="#E3F2FD"
+                >
+                  <div className="mb-3 text-xs font-bold text-[#1565C0]">
+                    Photo Analysis Result
+                  </div>
+                  <div className="mb-4 flex h-32 items-center justify-center rounded-xl border-[2px] border-[#90CAF9] bg-white">
+                    <div className="text-center">
+                      <HugeiconsIcon
+                        color="#90CAF9"
+                        icon={Camera01Icon}
+                        size={32}
+                        strokeWidth={1.5}
                       />
+                      <div className="mt-1 text-[11px] font-bold text-[#90CAF9]">
+                        Grilled chicken + rice
+                      </div>
                     </div>
                   </div>
-                  <h3 className="font-display text-xl font-bold text-[#2D2A26]">
-                    Auto-sync your glucose meter
-                  </h3>
-                  <p className="text-[14px] leading-relaxed text-[#78716C]">
-                    Pair your <strong>Accu-Chek</strong> via Bluetooth and
-                    readings sync automatically when you open the app. Or import
-                    history from <strong>FreeStyle Libre</strong>,{" "}
-                    <strong>Dexcom</strong>, and <strong>MySugr</strong> — CSV
-                    or Excel, we parse it all.
-                  </p>
-                </div>
-              </ClayCard>
-            </Reveal>
+                  <div className="grid grid-cols-3 gap-2">
+                    {[
+                      { label: "Carbs", value: "42g", color: "#F5A623" },
+                      { label: "Protein", value: "28g", color: "#2E7D32" },
+                      { label: "Fat", value: "12g", color: "#E91E63" },
+                    ].map((n) => (
+                      <div
+                        key={n.label}
+                        className="rounded-xl border-[2px] border-[#BBDEFB] bg-white p-2.5 text-center"
+                      >
+                        <div
+                          className="font-display text-lg font-extrabold"
+                          style={{ color: n.color }}
+                        >
+                          {n.value}
+                        </div>
+                        <div className="text-[10px] font-bold text-[#A8A29E]">
+                          {n.label}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                  <div className="mt-3 rounded-xl border-[2px] border-[#90CAF9] bg-white px-3 py-2 text-center text-[12px] font-bold text-[#1565C0]">
+                    Suggested: <span className="text-[#F5A623]">3.5 units</span>{" "}
+                    (1:12 ratio)
+                  </div>
+                </ClayCard>
+              </div>
+            </div>
+          </Reveal>
+        </div>
+      </section>
 
-            <Reveal delay={100}>
-              <ClayCard
-                borderColor="#FFCC80"
-                className="h-full"
-                color="#FFF8E1"
-              >
-                <div className="flex flex-col gap-4">
-                  <ClayIcon
-                    bg="#FFFFFF"
-                    border="#FFCC80"
-                    color="#E65100"
-                    icon={Restaurant01Icon}
-                  />
-                  <h3 className="font-display text-xl font-bold text-[#2D2A26]">
-                    AI diet plans that fit your ratio
-                  </h3>
-                  <p className="text-[14px] leading-relaxed text-[#78716C]">
-                    Tell us your insulin-to-carb ratio, dietary preferences, and
-                    foods you love or hate. AI generates a{" "}
-                    <strong>personalized 7-day meal plan</strong> with exact
-                    carb counts and insulin suggestions for every meal.
-                  </p>
-                </div>
-              </ClayCard>
-            </Reveal>
+      {/* ═══════════════ FEATURE 3: DEVICE SYNC ═══════════════ */}
+      <section className="px-6 py-28" style={{ background: "#FFFFFF" }}>
+        <div className="mx-auto max-w-5xl">
+          <Reveal>
+            <div className="flex flex-col items-center gap-14 lg:flex-row lg:gap-20">
+              {/* Text */}
+              <div className="flex-1">
+                <ClayIcon
+                  bg="#E3F2FD"
+                  border="#90CAF9"
+                  color="#1565C0"
+                  icon={BluetoothIcon}
+                />
+                <h2 className="mb-4 mt-5 font-display text-3xl font-extrabold text-[#2D2A26] sm:text-4xl">
+                  Your meter syncs.
+                  <br />
+                  You do nothing.
+                </h2>
+                <p className="mb-6 max-w-md text-[15px] leading-relaxed text-[#78716C]">
+                  Pair your <strong>Accu-Chek</strong> glucose meter via
+                  Bluetooth once. After that, readings sync automatically every
+                  time you open the app — no clicks, no cables, no manual entry.
+                </p>
+                <p className="max-w-md text-[15px] leading-relaxed text-[#78716C]">
+                  Switching from another app? Import your full history from{" "}
+                  <strong>FreeStyle Libre</strong>, <strong>Dexcom</strong>, or{" "}
+                  <strong>MySugr</strong> — CSV and Excel files. We parse and
+                  normalize everything into one unified timeline.
+                </p>
+              </div>
 
-            <Reveal delay={200}>
-              <ClayCard
-                borderColor="#CE93D8"
-                className="h-full"
-                color="#F3E5F5"
-              >
-                <div className="flex flex-col gap-4">
-                  <ClayIcon
-                    bg="#FFFFFF"
-                    border="#CE93D8"
-                    color="#7B1FA2"
-                    icon={ChartLineData02Icon}
-                  />
-                  <h3 className="font-display text-xl font-bold text-[#2D2A26]">
-                    Trends, A1C estimation &amp; insights
-                  </h3>
-                  <p className="text-[14px] leading-relaxed text-[#78716C]">
-                    See your <strong>time-in-range</strong>, 7/30/90 day trends,
-                    and an <strong>AI-estimated A1C</strong> from your readings
-                    — no lab visit needed. Spot patterns like post-meal spikes
-                    and dawn phenomenon before your next appointment.
-                  </p>
-                </div>
-              </ClayCard>
-            </Reveal>
+              {/* Visual: device list */}
+              <div className="w-full max-w-xs flex-shrink-0 space-y-3">
+                {[
+                  {
+                    name: "Accu-Chek Guide",
+                    status: "Auto-synced",
+                    icon: BluetoothIcon,
+                    border: "#90CAF9",
+                    bg: "#E3F2FD",
+                    statusColor: "#2E7D32",
+                  },
+                  {
+                    name: "FreeStyle Libre",
+                    status: "CSV import",
+                    icon: Upload02Icon,
+                    border: "#A5D6A7",
+                    bg: "#F1F8E9",
+                    statusColor: "#558B2F",
+                  },
+                  {
+                    name: "Dexcom G6",
+                    status: "CSV import",
+                    icon: Upload02Icon,
+                    border: "#CE93D8",
+                    bg: "#F3E5F5",
+                    statusColor: "#7B1FA2",
+                  },
+                  {
+                    name: "MySugr",
+                    status: "CSV / Excel",
+                    icon: Upload02Icon,
+                    border: "#FFCC80",
+                    bg: "#FFF8E1",
+                    statusColor: "#E65100",
+                  },
+                ].map((d) => (
+                  <ClayCard
+                    key={d.name}
+                    borderColor={d.border}
+                    className="!p-4"
+                    color={d.bg}
+                  >
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <div
+                          className="flex h-10 w-10 items-center justify-center rounded-[12px] border-[2px] bg-white"
+                          style={{ borderColor: d.border }}
+                        >
+                          <HugeiconsIcon
+                            color={d.statusColor}
+                            icon={d.icon}
+                            size={18}
+                            strokeWidth={2}
+                          />
+                        </div>
+                        <div>
+                          <div className="text-sm font-bold text-[#2D2A26]">
+                            {d.name}
+                          </div>
+                          <div
+                            className="text-[11px] font-bold"
+                            style={{ color: d.statusColor }}
+                          >
+                            {d.status}
+                          </div>
+                        </div>
+                      </div>
+                      <svg
+                        className="h-4 w-4 text-[#D4CFC8]"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth={2.5}
+                        viewBox="0 0 24 24"
+                      >
+                        <path d="M5 13l4 4L19 7" />
+                      </svg>
+                    </div>
+                  </ClayCard>
+                ))}
+              </div>
+            </div>
+          </Reveal>
+        </div>
+      </section>
 
-            <Reveal delay={300}>
-              <ClayCard
-                borderColor="#A5D6A7"
-                className="h-full"
-                color="#F1F8E9"
-              >
-                <div className="flex flex-col gap-4">
-                  <ClayIcon
-                    bg="#FFFFFF"
-                    border="#A5D6A7"
-                    color="#2E7D32"
-                    icon={Target01Icon}
-                  />
-                  <h3 className="font-display text-xl font-bold text-[#2D2A26]">
-                    Knows your insulin math
-                  </h3>
-                  <p className="text-[14px] leading-relaxed text-[#78716C]">
-                    Set your <strong>insulin-to-carb ratio</strong> and{" "}
-                    <strong>correction factor</strong> once. Every time you log
-                    a meal, the app calculates exactly how many units you need —
-                    whether you&apos;re on a pen or syringe.
-                  </p>
+      {/* ═══════════════ FEATURE 4: AI DIET PLANS ═══════════════ */}
+      <section className="px-6 py-28" style={{ background: "#FFF8F0" }}>
+        <div className="mx-auto max-w-5xl">
+          <Reveal>
+            <div className="flex flex-col items-center gap-14 lg:flex-row-reverse lg:gap-20">
+              {/* Text */}
+              <div className="flex-1">
+                <ClayIcon
+                  bg="#FFF8E1"
+                  border="#FFCC80"
+                  color="#E65100"
+                  icon={Restaurant01Icon}
+                />
+                <h2 className="mb-4 mt-5 font-display text-3xl font-extrabold text-[#2D2A26] sm:text-4xl">
+                  Meal plans built
+                  <br />
+                  around <em>your</em> ratio.
+                </h2>
+                <p className="max-w-md text-[15px] leading-relaxed text-[#78716C]">
+                  Tell us your insulin-to-carb ratio, your favorite foods, and
+                  any dietary restrictions. AI generates a{" "}
+                  <strong>personalized 7-day meal plan</strong> — breakfast,
+                  lunch, dinner, and snacks — with exact carb counts per meal
+                  and the insulin dose you&apos;d need for each. Save foods you
+                  like to your <strong>pantry</strong> and get suggestions based
+                  on what you already have.
+                </p>
+              </div>
+
+              {/* Visual: meal plan mockup */}
+              <div className="w-full max-w-sm flex-shrink-0">
+                <ClayCard
+                  borderColor="#FFCC80"
+                  className="!p-5"
+                  color="#FFF8E1"
+                >
+                  <div className="mb-3 flex items-center justify-between">
+                    <span className="font-display text-sm font-bold text-[#E65100]">
+                      Monday Plan
+                    </span>
+                    <span className="rounded-full border-[2px] border-[#FFCC80] bg-white px-2.5 py-0.5 text-[10px] font-bold text-[#E65100]">
+                      1:12 ratio
+                    </span>
+                  </div>
+                  {[
+                    {
+                      meal: "Breakfast",
+                      food: "Oatmeal + banana + almond milk",
+                      carbs: "38g",
+                      units: "3",
+                    },
+                    {
+                      meal: "Lunch",
+                      food: "Grilled chicken wrap + veggies",
+                      carbs: "45g",
+                      units: "4",
+                    },
+                    {
+                      meal: "Snack",
+                      food: "Apple slices + peanut butter",
+                      carbs: "22g",
+                      units: "2",
+                    },
+                    {
+                      meal: "Dinner",
+                      food: "Salmon, sweet potato, broccoli",
+                      carbs: "35g",
+                      units: "3",
+                    },
+                  ].map((m) => (
+                    <div
+                      key={m.meal}
+                      className="mb-2 rounded-xl border-[2px] border-[#FFE0B2] bg-white px-3.5 py-2.5"
+                    >
+                      <div className="flex items-center justify-between">
+                        <span className="text-[11px] font-bold text-[#E65100]">
+                          {m.meal}
+                        </span>
+                        <span className="text-[10px] font-bold text-[#A8A29E]">
+                          {m.carbs} · {m.units}u
+                        </span>
+                      </div>
+                      <div className="mt-0.5 text-[12px] text-[#78716C]">
+                        {m.food}
+                      </div>
+                    </div>
+                  ))}
+                  <div className="mt-2 rounded-xl border-[2px] border-[#FFCC80] bg-[#FFF3E0] px-3 py-2 text-center text-[12px] font-bold text-[#E65100]">
+                    Daily total: 140g carbs · 12 units
+                  </div>
+                </ClayCard>
+              </div>
+            </div>
+          </Reveal>
+        </div>
+      </section>
+
+      {/* ═══════════════ FEATURE 5: TRENDS & A1C ═══════════════ */}
+      <section className="px-6 py-28" style={{ background: "#FFFFFF" }}>
+        <div className="mx-auto max-w-5xl">
+          <Reveal>
+            <div className="flex flex-col items-center gap-14 lg:flex-row lg:gap-20">
+              {/* Text */}
+              <div className="flex-1">
+                <ClayIcon
+                  bg="#F3E5F5"
+                  border="#CE93D8"
+                  color="#7B1FA2"
+                  icon={ChartLineData02Icon}
+                />
+                <h2 className="mb-4 mt-5 font-display text-3xl font-extrabold text-[#2D2A26] sm:text-4xl">
+                  See your patterns.
+                  <br />
+                  Know your A1C.
+                </h2>
+                <p className="mb-6 max-w-md text-[15px] leading-relaxed text-[#78716C]">
+                  Beautiful charts show your <strong>time-in-range</strong>,
+                  7/30/90 day glucose trends, and average readings by time of
+                  day. Spot post-meal spikes, dawn phenomenon, and overnight
+                  lows before your next endo visit.
+                </p>
+                <p className="max-w-md text-[15px] leading-relaxed text-[#78716C]">
+                  Don&apos;t want to wait for lab results? Our AI estimates your{" "}
+                  <strong>A1C from your readings</strong> — updated in real time
+                  as you log more data.
+                </p>
+              </div>
+
+              {/* Visual: chart + A1C mockup */}
+              <div className="w-full max-w-sm flex-shrink-0 space-y-3">
+                <ClayCard
+                  borderColor="#CE93D8"
+                  className="!p-5"
+                  color="#F3E5F5"
+                >
+                  <div className="mb-3 flex items-center justify-between">
+                    <span className="text-xs font-bold text-[#7B1FA2]">
+                      30-Day Trend
+                    </span>
+                    <span className="rounded-full border-[2px] border-[#CE93D8] bg-white px-2 py-0.5 text-[10px] font-bold text-[#7B1FA2]">
+                      ↓ 8% avg
+                    </span>
+                  </div>
+                  <div className="flex items-end gap-[3px]">
+                    {[
+                      55, 70, 62, 78, 50, 65, 58, 72, 45, 60, 52, 68, 48, 55,
+                      50,
+                    ].map((h, i) => (
+                      <div
+                        key={i}
+                        className="flex-1 rounded-t-[4px] border-[1.5px] border-[#BA68C8]"
+                        style={{ height: `${h}px`, background: "#E1BEE7" }}
+                      />
+                    ))}
+                  </div>
+                </ClayCard>
+                <div className="grid grid-cols-2 gap-3">
+                  <ClayCard
+                    borderColor="#A5D6A7"
+                    className="!p-4 text-center"
+                    color="#F1F8E9"
+                  >
+                    <div className="font-display text-2xl font-extrabold text-[#2E7D32]">
+                      78%
+                    </div>
+                    <div className="text-[10px] font-bold text-[#A8A29E]">
+                      Time in Range
+                    </div>
+                  </ClayCard>
+                  <ClayCard
+                    borderColor="#FFCC80"
+                    className="!p-4 text-center"
+                    color="#FFF8E1"
+                  >
+                    <div className="font-display text-2xl font-extrabold text-[#E65100]">
+                      6.8%
+                    </div>
+                    <div className="text-[10px] font-bold text-[#A8A29E]">
+                      Estimated A1C
+                    </div>
+                  </ClayCard>
                 </div>
-              </ClayCard>
-            </Reveal>
-          </div>
+              </div>
+            </div>
+          </Reveal>
+        </div>
+      </section>
+
+      {/* ═══════════════ FEATURE 6: INSULIN CALCULATOR ═══════════════ */}
+      <section className="px-6 py-28" style={{ background: "#FFF8F0" }}>
+        <div className="mx-auto max-w-5xl">
+          <Reveal>
+            <div className="flex flex-col items-center gap-14 lg:flex-row-reverse lg:gap-20">
+              {/* Text */}
+              <div className="flex-1">
+                <ClayIcon
+                  bg="#F1F8E9"
+                  border="#A5D6A7"
+                  color="#2E7D32"
+                  icon={Target01Icon}
+                />
+                <h2 className="mb-4 mt-5 font-display text-3xl font-extrabold text-[#2D2A26] sm:text-4xl">
+                  It knows your
+                  <br />
+                  insulin math.
+                </h2>
+                <p className="max-w-md text-[15px] leading-relaxed text-[#78716C]">
+                  Set your <strong>insulin-to-carb ratio</strong> and{" "}
+                  <strong>correction factor</strong> once in your profile. Every
+                  time you log a meal — by chat, photo, or voice — the app
+                  calculates exactly how many units you need. Works whether
+                  you&apos;re on a pen or syringe. One less thing to do in your
+                  head.
+                </p>
+              </div>
+
+              {/* Visual: calculator mockup */}
+              <div className="w-full max-w-xs flex-shrink-0">
+                <ClayCard
+                  borderColor="#A5D6A7"
+                  className="!p-5"
+                  color="#F1F8E9"
+                >
+                  <div className="mb-4 text-xs font-bold text-[#558B2F]">
+                    Dose Calculator
+                  </div>
+                  {[
+                    { label: "Meal carbs", value: "62g" },
+                    { label: "Your ratio", value: "1:12" },
+                    { label: "Current BG", value: "185 mg/dL" },
+                    { label: "Target BG", value: "120 mg/dL" },
+                    { label: "Correction factor", value: "1:40" },
+                  ].map((r) => (
+                    <div
+                      key={r.label}
+                      className="mb-2 flex items-center justify-between rounded-xl border-[2px] border-[#C8E6C9] bg-white px-3.5 py-2"
+                    >
+                      <span className="text-[12px] font-medium text-[#78716C]">
+                        {r.label}
+                      </span>
+                      <span className="text-[12px] font-bold text-[#2D2A26]">
+                        {r.value}
+                      </span>
+                    </div>
+                  ))}
+                  <div
+                    className="mt-3 rounded-xl border-[3px] border-[#66BB6A] px-4 py-3 text-center"
+                    style={{
+                      background: "#E8F5E9",
+                      boxShadow: "0 4px 0 #A5D6A7",
+                    }}
+                  >
+                    <div className="text-[11px] font-bold text-[#558B2F]">
+                      Recommended dose
+                    </div>
+                    <div className="font-display text-3xl font-extrabold text-[#2E7D32]">
+                      7 units
+                    </div>
+                    <div className="text-[10px] font-bold text-[#81C784]">
+                      5 meal + 2 correction
+                    </div>
+                  </div>
+                </ClayCard>
+              </div>
+            </div>
+          </Reveal>
         </div>
       </section>
 
